@@ -46,7 +46,9 @@ void testMatrix(HT1632 *matrix) {
 
 void testMatrix(HT1632 *matrix) {
   matrix->fillScreen();
+  matrix->dumpScreen();
 }
+
 
 int main(void) {
   printf("Starting...\n");

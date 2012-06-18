@@ -375,23 +375,23 @@ HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
 
   if (_cs > 0) {
     export_gpio(_cs);
-    set_gpio_direction(_cs, "out");
     set_gpio_value(_cs, HIGH);
+    set_gpio_direction(_cs, "out");
   }
   if (_wr > 0) {
     export_gpio(_wr);
-    set_gpio_direction(_wr, "out");
     set_gpio_value(_wr, HIGH);
+    set_gpio_direction(_wr, "out");
   }
   if (_data > 0) {
     export_gpio(_data);
-    set_gpio_direction(_data, "out");
     set_gpio_value(_data, HIGH);
+    set_gpio_direction(_data, "out");
   }
   if (_rd > 0) {
     export_gpio(_rd);
-    set_gpio_direction(_rd, "in");
     set_gpio_value(_rd, HIGH);
+    set_gpio_direction(_rd, "in");
   }
   
   for (uint8_t i=0; i<48; i++) {
@@ -436,18 +436,18 @@ void HT1632::clrPixel(uint16_t i) {
 }
 
 void HT1632::dumpScreen() {
-  printf("---------------------------------------");
+  printf("---------------------------------------\n\n");
 
   for (uint16_t i=0; i<(WIDTH*HEIGHT/8); i++) {
     printf("0x%X ",ledmatrix[i]);
     if (i % 3 == 2) printf("\n");
   }
 
-  printf("\n---------------------------------------");
+  printf("\n---------------------------------------\n");
 }
 
 void HT1632::writeScreen() {
-  writeRAMburst(0, &ledmatrix[0], (WIDTH*HEIGHT/8));
+  writeRAMburst(0, ledmatrix, (WIDTH*HEIGHT/8));
 }
 
 void HT1632::clearScreen() {
@@ -543,19 +543,19 @@ void HT1632::writeRAMburst(uint8_t addr, uint8_t *data, uint8_t length) {
   writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
   writedata(addr, HT1632_ADDRESS_LENGTH);
   for (i = 0; i < length; i++) {
-    //printf("Writing 0x%X to 0x%X", data[i]&0xF, (addr+i)&0x7F);
-    writedata(data[i], HT1632_WRITE_LENGTH);
+    //printf("Writing 0x%X to 0x%X\n", data[i], (addr+i)&0x7F);
+    writedata(data[i], 2*HT1632_WRITE_LENGTH);
   }
   set_gpio_value(_cs, HIGH);
 }
 
 void HT1632::writeRAM(uint8_t addr, uint8_t data) {
-  //printf("Writing 0x%X to 0x%X", data&0xF, addr&0x7F);
+  //printf("Writing 0x%X to 0x%X\n", data, addr&0x7F);
 
   set_gpio_value(_cs, LOW);
   writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
   writedata(addr, HT1632_ADDRESS_LENGTH);
-  writedata(data, HT1632_WRITE_LENGTH);
+  writedata(data, 2*HT1632_WRITE_LENGTH);
   set_gpio_value(_cs, HIGH);
 }
 
@@ -563,7 +563,7 @@ void HT1632::writeRAM(uint8_t addr, uint8_t data) {
 void HT1632::sendcommand(uint8_t cmd) {
   set_gpio_value(_cs, LOW);
   writedata(HT1632_COMMAND, HT1632_HEAD_LENGTH);
-  writedata(cmd, HT1632_COMMAND_LENGTH);
+  writedata((uint16_t)cmd << 1, HT1632_COMMAND_LENGTH);
   set_gpio_value(_cs, HIGH);
 }
 
