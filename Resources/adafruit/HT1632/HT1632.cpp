@@ -9,37 +9,37 @@
 
 uint16_t _BV(uint8_t value) {
   switch (value) {
-    case 1:
+    case 0:
       return BIT0;
-    case 2:
+    case 1:
       return BIT1;
-    case 3:
+    case 2:
       return BIT2;
-    case 4:
+    case 3:
       return BIT3;
-    case 5:
+    case 4:
       return BIT4;
-    case 6:
+    case 5:
       return BIT5;
-    case 7:
+    case 6:
       return BIT6;
-    case 8:
+    case 7:
       return BIT7;
-    case 9:
+    case 8:
       return BIT8;
-    case 10:
+    case 9:
       return BIT9;
-    case 11:
+    case 10:
       return BITA;
-    case 12:
+    case 11:
       return BITB;
-    case 13:
+    case 12:
       return BITC;
-    case 14:
+    case 13:
       return BITD;
-    case 15:
+    case 14:
       return BITE;
-    case 16:
+    case 15:
       return BITF;
     default:
       return 0;
@@ -391,7 +391,7 @@ HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   if (_rd > 0) {
     export_gpio(_rd);
     set_gpio_value(_rd, HIGH);
-    set_gpio_direction(_rd, "in");
+    set_gpio_direction(_rd, "out");
   }
   
   for (uint8_t i=0; i<48; i++) {
@@ -550,12 +550,12 @@ void HT1632::writeRAMburst(uint8_t addr, uint8_t *data, uint8_t length) {
 }
 
 void HT1632::writeRAM(uint8_t addr, uint8_t data) {
-  //printf("Writing 0x%X to 0x%X\n", data, addr&0x7F);
+  //printf("Writing 0x%X to 0x%X\n", data&0xF, addr&0x7F);
 
   set_gpio_value(_cs, LOW);
   writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
   writedata(addr, HT1632_ADDRESS_LENGTH);
-  writedata(data, 2*HT1632_WRITE_LENGTH);
+  writedata(data, HT1632_WRITE_LENGTH);
   set_gpio_value(_cs, HIGH);
 }
 

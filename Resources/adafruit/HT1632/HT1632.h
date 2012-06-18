@@ -2,7 +2,6 @@
 #include <time.h>
 
 #define DELAY 1000
-//#define DELAY 10000
 
 #define HIGH 1
 #define LOW 0
