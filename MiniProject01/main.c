@@ -28,7 +28,7 @@
 
 // Temperature sensor on I2C2 (bus 3)
 #define I2C_BUS_FILE "/dev/i2c-3"
-#define I2C_DEV_ADDRESS 0x4A
+#define I2C_DEV_ADDRESS 0x4B
 #define I2C_REG_ADDRESS 0
 
 int led0_fd, led1_fd, button_fd;
@@ -137,6 +137,7 @@ int main(int argc, char** argv){
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
+			read(fdset[0].fd, (void *)buf, MAX_BUF);
 			printf("Current Temperature = %d degrees C", getTemp());
 			led0_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
