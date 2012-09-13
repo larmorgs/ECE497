@@ -12,8 +12,8 @@
 // readings off of the TC74 temperature sensor. The temperature in degrees Celcius is output to 
 // the terminal. LED0 also toggles when the button is pressed.
 
-// At the same time, an analog input is read once a second. The voltage is used to control the 
-// PWM duty cycle on an output that goes to LED1. The program handles the ^C interrupt by
+// At the same time, an analog input is read ten times a second. The voltage is used to control 
+// the PWM duty cycle on an output that goes to LED1. The program handles the ^C interrupt by
 // printing a shutdown message to the terminal.
 
 // LED0 on GPIO1_16
@@ -34,7 +34,7 @@
 #define I2C_DEV_ADDRESS 0x4B
 #define I2C_REG_ADDRESS 0
 
-#define TIMEOUT 1000
+#define TIMEOUT 100
 
 int led0_fd, led1_fd, button_fd;
 int led0_value = 1;
@@ -134,14 +134,13 @@ int main(int argc, char** argv){
 		}
 	
 		if (rc == 0){
-			printf(".");
 			set_pwm(LED1_PWM, 10, read_ain(POT)/41);
 			fflush(stdout);
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
 			read(fdset[0].fd, (void *)buf, MAX_BUF);
-			printf("Current Temperature = %d degrees C\n", getTemp());
+			printf("\nCurrent Temperature = %d degrees C", getTemp());
 			led0_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
 		}			
