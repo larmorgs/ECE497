@@ -32,8 +32,8 @@
 #define I2C_REG_ADDRESS 0
 
 int led0_fd, led1_fd, button_fd;
-int led0_value = 0;
-int led1_value = 0;
+int led0_value = 1;
+int led1_value = 1;
 
 //signal handler that breaks program loop and cleans up
 void signal_handler(int signo){
@@ -137,14 +137,9 @@ int main(int argc, char** argv){
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
- 			read(fdset[0].fd, (void *)buf, MAX_BUF);
-			printf("interrupt value=%s\n", buf);
+			printf("Current Temperature = %d\u2103C", getTemp());
 			led0_value = led0_value^1;
-			led1_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
-			set_gpio_value(LED1, led1_value);
-			printf("led0_value  = %d\n", led0_value);
-			printf("led1_value  = %d\n", led1_value);
 		}			
 		
 	}
