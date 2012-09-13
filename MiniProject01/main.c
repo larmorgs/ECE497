@@ -18,14 +18,16 @@
 
 // LED0 on GPIO1_16
 #define LED0 48
-// LED1 on GPIO1_17
-#define LED1 49
+// LED1 on ehrpwm1A
+#define LED1_MUX "gpmc_a2"
+#define LED1_MUX_VAL 6
+#define LED1_PWM "ehrpwm.1\\:0"
 
 // Button on GPIO3_19
 #define BUTTON 115
 
-// Pot on AIN5
-#define POT "AIN5"
+// Pot on AIN5 (ain6)
+#define POT "ain6"
 
 // Temperature sensor on I2C2 (bus 3)
 #define I2C_BUS_FILE "/dev/i2c-3"
@@ -47,7 +49,6 @@ void signal_handler(int signo){
 		gpio_fd_close(led1_fd);
 		gpio_fd_close(button_fd);
 		unexport_gpio(LED0);
-		unexport_gpio(LED1);
 		unexport_gpio(BUTTON);
 
 		fflush(stdout);
@@ -62,10 +63,9 @@ void init(void) {
 	set_gpio_direction(LED0, "out");
 	set_gpio_value(LED0, led0_value);
 	led0_fd = gpio_fd_open(LED0);
-	export_gpio(LED1);
-	set_gpio_direction(LED1, "out");
-	set_gpio_value(LED1, led1_value);
-	led1_fd = gpio_fd_open(LED1);
+
+	set_mux_value(LED1_MUX, LED1_MUX_VAL);
+	set_pwm(LED1_PWM, 10, read_ain(POT)/41);
 
 	//Set button to input
 	export_gpio(BUTTON);
@@ -134,8 +134,8 @@ int main(int argc, char** argv){
 		}
 	
 		if (rc == 0){
-			//printf(".");
-			printf("ain5 = %d\n", read_ain(POT));
+			printf(".");
+			set_pwm(LED1_PWM, 10, read_ain(POT)/41);
 			fflush(stdout);
 		}
 
