@@ -4,7 +4,7 @@ TARGETS=main.o
 all: $(TARGETS)
 
 clean: 
-	rm $(TARGETS)
+	rm -f $(TARGETS)
 
 %.o: %.c
 	$(CC) $< -o $@
