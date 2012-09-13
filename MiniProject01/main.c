@@ -1,4 +1,5 @@
 #include "../RESOURCES/ECE497/BoneHeader.h"
+#include "../../exercises/i2c/i2c-dev.h"
 #include <poll.h>
 #include <signal.h>
 #include <errno.h>
@@ -22,6 +23,13 @@
 
 // Button on GPIO3_19
 #define BUTTON 105
+
+// Pot on AIN5
+
+// Temperature sensor on I2C2 (bus 3)
+#define I2C_BUS_FILE "/dev/i2c-3"
+#define I2C_DEV_ADDRESS 0x4A
+#define I2C_REG_ADDRESS 0
 
 int led0_fd, led1_fd, button_fd;
 int led0_value = 0;
@@ -53,6 +61,40 @@ void init(void) {
 	set_gpio_direction(BUTTON, "in");
 	set_gpio_edge(BUTTON, "falling");
 	button_fd = gpio_fd_open(BUTTON);
+}
+
+int getTemp(void) {
+	int res, file;
+
+	file = open(I2C_BUS_FILE, O_RDWR);
+	if (file<0) {
+		if (errno == ENOENT) {
+			fprintf(stderr, "Error: Could not open file "
+				I2C_BUS_FILE ": %s\n", strerror(ENOENT));
+		} else {
+			fprintf(stderr, "Error: Could not open file "
+				I2C_BUS_FILE ": %s\n", strerror(errno));
+			if (errno == EACCES)
+				fprintf(stderr, "Run as root?\n");
+		}
+		return -1;
+	}
+
+	if (ioctl(file, I2C_SLAVE, I2C_DEV_ADDRESS) < 0) {
+		fprintf(stderr,
+			"Error: Could not set address to 0x%02x: %s\n",
+			I2C_DEV_ADDRESS, strerror(errno));
+		return -1;
+	}
+
+	res = i2c_smbus_read_byte_data(file, I2C_REG_ADDRESS);
+	close(file);
+
+	if (res < 0) {
+		fprintf(stderr, "Error: Read failed, res=%d\n", res);
+		return -1;
+	}
+	return res;
 }
 
 int main(int argc, char** argv){
