@@ -25,11 +25,14 @@
 #define BUTTON 115
 
 // Pot on AIN5
+#define POT 5
 
 // Temperature sensor on I2C2 (bus 3)
 #define I2C_BUS_FILE "/dev/i2c-3"
 #define I2C_DEV_ADDRESS 0x4B
 #define I2C_REG_ADDRESS 0
+
+#define TIMEOUT 1000
 
 int led0_fd, led1_fd, button_fd;
 int led0_value = 1;
@@ -108,8 +111,6 @@ int getTemp(void) {
 int main(int argc, char** argv){
 	//variable declarations
 	struct pollfd fdset[1];
-	int nfds = 1;
-	int timeout = 3000;
 	int rc;
 	char buf[MAX_BUF];
 
@@ -125,7 +126,7 @@ int main(int argc, char** argv){
 		fdset[0].fd = button_fd;
 		fdset[0].events = POLLPRI;
 
-		rc = poll(fdset, nfds, timeout);
+		rc = poll(fdset, POLLIN, TIMEOUT);
 
 		if (rc < 0){
 			printf("\npoll() failed!\n");
@@ -133,12 +134,14 @@ int main(int argc, char** argv){
 		}
 	
 		if (rc == 0){
-			printf(".");
+			//printf(".");
+			printf("ain5 = %d\n", read_ain(POT));
+			fflush(stdout);
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
 			read(fdset[0].fd, (void *)buf, MAX_BUF);
-			printf("Current Temperature = %d degrees C", getTemp());
+			printf("Current Temperature = %d degrees C\n", getTemp());
 			led0_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
 		}			
