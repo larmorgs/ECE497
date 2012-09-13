@@ -25,7 +25,7 @@
 #define BUTTON 115
 
 // Pot on AIN5
-#define POT 5
+#define POT "AIN5"
 
 // Temperature sensor on I2C2 (bus 3)
 #define I2C_BUS_FILE "/dev/i2c-3"
