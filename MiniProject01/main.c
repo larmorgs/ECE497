@@ -85,14 +85,14 @@ int getTemp(void) {
 			if (errno == EACCES)
 				fprintf(stderr, "Run as root?\n");
 		}
-		return -1;
+		exit(-1);
 	}
 
 	if (ioctl(file, I2C_SLAVE, I2C_DEV_ADDRESS) < 0) {
 		fprintf(stderr,
 			"Error: Could not set address to 0x%02x: %s\n",
 			I2C_DEV_ADDRESS, strerror(errno));
-		return -1;
+		exit(-2);
 	}
 
 	res = i2c_smbus_read_byte_data(file, I2C_REG_ADDRESS);
@@ -100,7 +100,7 @@ int getTemp(void) {
 
 	if (res < 0) {
 		fprintf(stderr, "Error: Read failed, res=%d\n", res);
-		return -1;
+		exit(-3);
 	}
 	return res;
 }
@@ -137,7 +137,7 @@ int main(int argc, char** argv){
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
-			printf("Current Temperature = %d\u2103C", getTemp());
+			printf("Current Temperature = %d degrees C", getTemp());
 			led0_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
 		}			
