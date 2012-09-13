@@ -10,11 +10,11 @@
 
 // In this project, I use the gpio interrupt from an external pushbutton to trigger temperature 
 // readings off of the TC74 temperature sensor. The temperature in degrees Celcius is output to 
-// the terminal.
+// the terminal. LED0 also toggles when the button is pressed.
 
 // At the same time, an analog input is read once a second. The voltage is used to control the 
-// PWM duty cycle on an output that goes to LED1. A heartbeat pattern is output on LED0. The 
-// program handles the ^C interrupt by printing a shutdown message to the terminal.
+// PWM duty cycle on an output that goes to LED1. The program handles the ^C interrupt by
+// printing a shutdown message to the terminal.
 
 // LED0 on GPIO1_16
 #define LED0 48
@@ -43,9 +43,9 @@ void signal_handler(int signo){
 		gpio_fd_close(led0_fd);
 		gpio_fd_close(led1_fd);
 		gpio_fd_close(button_fd);
-		unexport_gpio(led0_fd);
-		unexport_gpio(led1_fd);
-		unexport_gpio(button_fd);
+		unexport_gpio(LED0);
+		unexport_gpio(LED1);
+		unexport_gpio(BUTTON);
 
 		fflush(stdout);
 
@@ -67,7 +67,7 @@ void init(void) {
 	//Set button to input
 	export_gpio(BUTTON);
 	set_gpio_direction(BUTTON, "in");
-	set_gpio_edge(BUTTON, "both");
+	set_gpio_edge(BUTTON, "rising");
 	button_fd = gpio_fd_open(BUTTON);
 }
 
