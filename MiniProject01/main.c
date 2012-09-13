@@ -67,7 +67,7 @@ void init(void) {
 	//Set button to input
 	export_gpio(BUTTON);
 	set_gpio_direction(BUTTON, "in");
-	set_gpio_edge(BUTTON, "falling");
+	set_gpio_edge(BUTTON, "both");
 	button_fd = gpio_fd_open(BUTTON);
 }
 
@@ -137,9 +137,8 @@ int main(int argc, char** argv){
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
- 			if (read(fdset[0].fd, (void *)buf, MAX_BUF) > 0) {
-				printf("interrupt value=%s\n", buf);
-			}
+ 			read(fdset[0].fd, (void *)buf, MAX_BUF);
+			printf("interrupt value=%s\n", buf);
 			led0_value = led0_value^1;
 			led1_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
