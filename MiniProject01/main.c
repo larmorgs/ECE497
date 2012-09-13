@@ -1,5 +1,8 @@
+//Class headers (locations may change)
 #include "../RESOURCES/ECE497/BoneHeader.h"
 #include "../../exercises/i2c/i2c-dev.h"
+
+//Standard headers
 #include <poll.h>
 #include <signal.h>
 #include <errno.h>
@@ -35,9 +38,10 @@
 #define I2C_DEV_ADDRESS 0x4B
 #define I2C_REG_ADDRESS 0
 
+// Timeout poll used to trigger analog reads
 #define TIMEOUT 100
 
-int led0_fd, led1_fd, button_fd;
+int led0_fd, button_fd;
 int led0_value = 1;
 int led1_value = 1;
 
@@ -47,7 +51,6 @@ void signal_handler(int signo){
 		printf("\n^C pressed, unexporting gpios and exiting..\n");
 		
 		gpio_fd_close(led0_fd);
-		gpio_fd_close(led1_fd);
 		gpio_fd_close(button_fd);
 		unexport_gpio(LED0);
 		unexport_gpio(BUTTON);
@@ -59,16 +62,17 @@ void signal_handler(int signo){
 }
 
 void init(void) {
-	//Set LEDs to outputs
+	//Setup LED0 as GPIO OUT
 	export_gpio(LED0);
 	set_gpio_direction(LED0, "out");
 	set_gpio_value(LED0, led0_value);
 	led0_fd = gpio_fd_open(LED0);
 
+	//Setup MUX for PWM on LED1
 	set_mux_value(LED1_MUX, LED1_MUX_VAL);
-	set_pwm(LED1_PWM, LED1_PWM_FREQ, read_ain(POT)/41);
+	set_pwm(LED1_PWM, LED1_PWM_FREQ, read_ain(POT)/41); //Divide by 41 to put in the range [0, 99]
 
-	//Set button to input
+	//Setup button as GPIO IN
 	export_gpio(BUTTON);
 	set_gpio_direction(BUTTON, "in");
 	set_gpio_edge(BUTTON, "rising");
@@ -77,7 +81,8 @@ void init(void) {
 
 int getTemp(void) {
 	int res, file;
-
+	
+	//Read temperature from TC74
 	file = open(I2C_BUS_FILE, O_RDWR);
 	if (file<0) {
 		if (errno == ENOENT) {
@@ -135,11 +140,13 @@ int main(int argc, char** argv){
 		}
 	
 		if (rc == 0){
+			//Set PWM duty cycle based on potentiometer every 100ms
 			set_pwm(LED1_PWM, LED1_PWM_FREQ, read_ain(POT)/41);
 			fflush(stdout);
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
+			//Output temperature to stdout when button is pressed
 			read(fdset[0].fd, (void *)buf, MAX_BUF);
 			printf("\nCurrent Temperature = %d degrees C", getTemp());
 			led0_value = led0_value^1;
