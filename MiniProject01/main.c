@@ -111,7 +111,7 @@ int main(int argc, char** argv){
 	int nfds = 1;
 	int timeout = 3000;
 	int rc;
-	char* buf[MAX_BUF];
+	char buf[MAX_BUF];
 
 	init();
 
@@ -137,8 +137,8 @@ int main(int argc, char** argv){
 		}
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
- 			if (read(fdset[0].fd, buf, MAX_BUF) > 0) {
-				printf("interrupt value=%s\n", buf[0]);
+ 			if (read(fdset[0].fd, (void *)buf, MAX_BUF) > 0) {
+				printf("interrupt value=%s\n", buf);
 			}
 			led0_value = led0_value^1;
 			led1_value = led0_value^1;
