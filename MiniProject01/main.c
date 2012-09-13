@@ -138,7 +138,9 @@ int main(int argc, char** argv){
 
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
 			read(fdset[0].fd, buf, MAX_BUF);
-			printf("interrupt value=%s\n", buf[0]);
+			if (buf) {
+				printf("interrupt value=%s\n", buf[0]);
+			}
 			led0_value = led0_value^1;
 			led1_value = led0_value^1;
 			set_gpio_value(LED0, led0_value);
