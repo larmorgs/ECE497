@@ -22,7 +22,7 @@
 #define LED1 49
 
 // Button on GPIO3_19
-#define BUTTON 105
+#define BUTTON 115
 
 // Pot on AIN5
 
@@ -35,13 +35,21 @@ int led0_fd, led1_fd, button_fd;
 int led0_value = 0;
 int led1_value = 0;
 
-int keepgoing = 1;
-
 //signal handler that breaks program loop and cleans up
 void signal_handler(int signo){
 	if (signo == SIGINT) {
 		printf("\n^C pressed, unexporting gpios and exiting..\n");
-		keepgoing = 0;
+		
+		gpio_fd_close(led0_fd);
+		gpio_fd_close(led1_fd);
+		gpio_fd_close(button_fd);
+		unexport_gpio(led0_fd);
+		unexport_gpio(led1_fd);
+		unexport_gpio(button_fd);
+
+		fflush(stdout);
+
+		exit(0);
 	}
 }
 
@@ -108,10 +116,10 @@ int main(int argc, char** argv){
 	init();
 
 	//set signal handler
-	//if (signal(SIGINT, signal_handler) == SIG_ERR)
-	//	printf("\ncan't catch SIGINT\n");
+	if (signal(SIGINT, signal_handler) == SIG_ERR)
+		printf("\ncan't catch SIGINT\n");
 
-	while(keepgoing){
+	while (1) {
 		memset((void*)fdset, 0, sizeof(fdset));
 	
 		fdset[0].fd = button_fd;
@@ -121,6 +129,7 @@ int main(int argc, char** argv){
 
 		if (rc < 0){
 			printf("\npoll() failed!\n");
+			break;
 		}
 	
 		if (rc == 0){
@@ -140,13 +149,5 @@ int main(int argc, char** argv){
 		
 	}
 
-	gpio_fd_close(led0_fd);
-	gpio_fd_close(led1_fd);
-	gpio_fd_close(button_fd);
-	unexport_gpio(led0_fd);
-	unexport_gpio(led1_fd);
-	unexport_gpio(button_fd);
-
-	fflush(stdout);
-	return 0;
+	return -1;
 }
