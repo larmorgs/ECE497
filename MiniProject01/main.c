@@ -22,6 +22,7 @@
 #define LED1_MUX "gpmc_a2"
 #define LED1_MUX_VAL 6
 #define LED1_PWM "ehrpwm.1\:0"
+#define LED1_PWM_FREQ 1000
 
 // Button on GPIO3_19
 #define BUTTON 115
@@ -65,7 +66,7 @@ void init(void) {
 	led0_fd = gpio_fd_open(LED0);
 
 	set_mux_value(LED1_MUX, LED1_MUX_VAL);
-	set_pwm(LED1_PWM, 10, read_ain(POT)/41);
+	set_pwm(LED1_PWM, LED1_PWM_FREQ, read_ain(POT)/41);
 
 	//Set button to input
 	export_gpio(BUTTON);
@@ -134,7 +135,7 @@ int main(int argc, char** argv){
 		}
 	
 		if (rc == 0){
-			set_pwm(LED1_PWM, 10, read_ain(POT)/41);
+			set_pwm(LED1_PWM, LED1_PWM_FREQ, read_ain(POT)/41);
 			fflush(stdout);
 		}
 
