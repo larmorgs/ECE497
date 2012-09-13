@@ -108,8 +108,8 @@ int main(int argc, char** argv){
 	init();
 
 	//set signal handler
-	if (signal(SIGINT, signal_handler) == SIG_ERR)
-		printf("\ncan't catch SIGINT\n");
+	//if (signal(SIGINT, signal_handler) == SIG_ERR)
+	//	printf("\ncan't catch SIGINT\n");
 
 	while(keepgoing){
 		memset((void*)fdset, 0, sizeof(fdset));
