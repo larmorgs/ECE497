@@ -21,7 +21,7 @@
 // LED1 on ehrpwm1A
 #define LED1_MUX "gpmc_a2"
 #define LED1_MUX_VAL 6
-#define LED1_PWM "ehrpwm.1\\:0"
+#define LED1_PWM "ehrpwm.1\:0"
 
 // Button on GPIO3_19
 #define BUTTON 115
