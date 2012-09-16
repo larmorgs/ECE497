@@ -518,27 +518,27 @@ int HT1632::writedata(uint16_t d, uint8_t bits) {
   uint8_t i;
   for (i = 1; i < bits; i++) {
     set_gpio_value(_wr, LOW);
-    //nanosleep(&ts, NULL);
+    nanosleep(&ts, NULL);
     if (d & mask) {
       set_gpio_value(_data, HIGH);
     } else {
       set_gpio_value(_data, LOW);
     }
-    //nanosleep(&ts, NULL);
+    nanosleep(&ts, NULL);
     set_gpio_value(_wr, HIGH);
-    //nanosleep(&ts2, NULL);
+    nanosleep(&ts2, NULL);
     d <<= 1;
   }
   set_gpio_value(_wr, LOW);
-  //nanosleep(&ts, NULL);
+  nanosleep(&ts, NULL);
   if (d & mask) {
     set_gpio_value(_data, HIGH);
   } else {
     set_gpio_value(_data, LOW);
   }
-  //nanosleep(&ts, NULL);
+  nanosleep(&ts, NULL);
   set_gpio_value(_wr, HIGH);
-  //nanosleep(&ts2, NULL);
+  nanosleep(&ts2, NULL);
   return 0;
 }
 
