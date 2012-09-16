@@ -450,7 +450,7 @@ void HT1632::dumpScreen() {
 }
 
 void HT1632::writeScreen() {
-  writeRAMburst(0, ledmatrix, (WIDTH*HEIGHT/8));
+  writeRAMburst(0, &ledmatrix[0], (WIDTH*HEIGHT/8));
 }
 
 void HT1632::clearScreen() {
@@ -560,7 +560,7 @@ void HT1632::writeRAM(uint8_t addr, uint8_t data) {
   set_gpio_value(_cs, LOW);
   writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
   writedata(addr, HT1632_ADDRESS_LENGTH);
-  writedata(_data, HT1632_WRITE_LENGTH);
+  writedata(data, HT1632_WRITE_LENGTH);
   set_gpio_value(_cs, HIGH);
 }
 
