@@ -367,7 +367,7 @@ void HT1632LEDMatrix::write(uint8_t c) {
 //////////////////////////////////////////////////////////////////////////
 
 
-HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd=-1) {
+HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   _data = data;
   _wr = wr;
   _cs = cs;
