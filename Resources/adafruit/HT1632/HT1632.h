@@ -1,10 +1,36 @@
-#if(ARDUINO >= 100)
- #include <Arduino.h>
-#else
- #include <WProgram.h>
-#endif
+#include <stdint.h>
 
-#define HT1632_READ  0x6
+#define HALF_DELAY 1
+#define DELAY (2 * HALF_DELAY)
+
+#define HIGH 1
+#define LOW 0
+
+#define BIT0 0x0001
+#define BIT1 0x0002
+#define BIT2 0x0004
+#define BIT3 0x0008
+#define BIT4 0x0010
+#define BIT5 0x0020
+#define BIT6 0x0040
+#define BIT7 0x0080
+#define BIT8 0x0100
+#define BIT9 0x0200
+#define BITA 0x0400
+#define BITB 0x0800
+#define BITC 0x1000
+#define BITD 0x2000
+#define BITE 0x4000
+#define BITF 0x8000
+
+
+
+#define HT1632_HEAD_LENGTH 3
+#define HT1632_ADDRESS_LENGTH 7
+
+#define HT1632_WRITE_LENGTH 4
+#define HT1632_COMMAND_LENGTH 9
+
 #define HT1632_WRITE 0x5
 #define HT1632_COMMAND 0x4
 
@@ -35,7 +61,7 @@ class HT1632 {
   void clrPixel(uint16_t i);
   void setPixel(uint16_t i);
 
-  void blink(boolean state);
+  void blink(bool state);
   void setBrightness(uint8_t pwm);
 
   void clearScreen();
@@ -48,11 +74,12 @@ class HT1632 {
   int8_t _data, _cs, _wr, _rd;
   uint8_t ledmatrix[48];     // 16 * 24 / 8
   void sendcommand(uint8_t c);
-  void writedata(uint16_t d, uint8_t bits);
+  int writedata(uint16_t d, uint8_t bits);
+  void writeRAMburst(uint8_t addr, uint8_t *data, uint8_t length);
   void writeRAM(uint8_t addr, uint8_t data);
 };
 
-class HT1632LEDMatrix : public Print {
+class HT1632LEDMatrix {
  public:
   HT1632LEDMatrix(uint8_t data, uint8_t wr, uint8_t cs1);
   HT1632LEDMatrix(uint8_t data, uint8_t wr, uint8_t cs1, uint8_t cs2);
@@ -64,7 +91,7 @@ class HT1632LEDMatrix : public Print {
  void begin(uint8_t type);
  void clearScreen(void);
  void fillScreen(void);
- void blink(boolean b);
+ void blink(bool b);
  void setBrightness(uint8_t brightness);
  void writeScreen();
  uint8_t width();
@@ -84,11 +111,7 @@ class HT1632LEDMatrix : public Print {
   void setCursor(uint8_t x, uint8_t y);
   void setTextSize(uint8_t s);
   void setTextColor(uint8_t c);
-#if(ARDUINO >= 100)
-  size_t write(uint8_t c);
-#else
   void write(uint8_t c);
-#endif
   void drawChar(uint8_t x, uint8_t y, char c, uint16_t color, uint8_t size);
 
   void drawBitmap(uint8_t x, uint8_t y, 

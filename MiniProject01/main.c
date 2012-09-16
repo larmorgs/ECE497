@@ -1,5 +1,5 @@
 //Class headers (locations may change)
-#include "../RESOURCES/ECE497/BoneHeader.h"
+#include "../Resources/BoneHeader/BoneHeader.h"
 #include "../../exercises/i2c/i2c-dev.h"
 
 //Standard headers

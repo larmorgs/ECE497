@@ -130,6 +130,7 @@ int unset_pwm(char* pwm);
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #define MAX_BUF 127
 

@@ -1,8 +1,50 @@
 #include "HT1632.h"
 #include "glcdfont.c"
-
+#include "../../BoneHeader/BoneHeader.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #define swap(a, b) { uint16_t t = a; a = b; b = t; }
+
+uint16_t _BV(uint8_t value) {
+  switch (value) {
+    case 1:
+      return BIT0;
+    case 2:
+      return BIT1;
+    case 3:
+      return BIT2;
+    case 4:
+      return BIT3;
+    case 5:
+      return BIT4;
+    case 6:
+      return BIT5;
+    case 7:
+      return BIT6;
+    case 8:
+      return BIT7;
+    case 9:
+      return BIT8;
+    case 10:
+      return BIT9;
+    case 11:
+      return BITA;
+    case 12:
+      return BITB;
+    case 13:
+      return BITC;
+    case 14:
+      return BITD;
+    case 15:
+      return BITE;
+    case 16:
+      return BITF;
+    default:
+      return 0;
+  }
+}
 
 HT1632LEDMatrix::HT1632LEDMatrix(uint8_t data, uint8_t wr, uint8_t cs1) {
   matrices = (HT1632 *)malloc(sizeof(HT1632));
@@ -125,7 +167,7 @@ void HT1632LEDMatrix::setBrightness(uint8_t b) {
   }
 }
 
-void HT1632LEDMatrix::blink(boolean b) {
+void HT1632LEDMatrix::blink(bool b) {
   for (uint8_t i=0; i<matrixNum; i++) {
     matrices[i].blink(b);
   }
@@ -277,11 +319,8 @@ void HT1632LEDMatrix::setTextColor(uint8_t c) {
   textcolor = c;
 }
 
-#if ARDUINO >= 100
-size_t HT1632LEDMatrix::write(uint8_t c) {
-#else
+/*
 void HT1632LEDMatrix::write(uint8_t c) {
-#endif
   if (c == '\n') {
     cursor_y += textsize*8;
     cursor_x = 0;
@@ -291,14 +330,11 @@ void HT1632LEDMatrix::write(uint8_t c) {
     drawChar(cursor_x, cursor_y, c, textcolor, textsize);
     cursor_x += textsize*6;
   }
-#if ARDUINO >= 100
-  return 1;
-#endif
 }
-
+*/
 
 // draw a character
-void HT1632LEDMatrix::drawChar(uint8_t x, uint8_t y, char c, 
+/*void HT1632LEDMatrix::drawChar(uint8_t x, uint8_t y, char c, 
 			      uint16_t color, uint8_t size) {
   for (uint8_t i =0; i<5; i++ ) {
     uint8_t line = pgm_read_byte(font+(c*5)+i);
@@ -313,10 +349,10 @@ void HT1632LEDMatrix::drawChar(uint8_t x, uint8_t y, char c,
       line >>= 1;
     }
   }
-}
+}*/
 
 
-void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y, 
+/*void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y, 
 			const uint8_t *bitmap, uint8_t w, uint8_t h,
 			uint8_t color) {
   for (uint8_t j=0; j<h; j++) {
@@ -326,7 +362,7 @@ void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y,
       }
     }
   }
-}
+}*/
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -337,23 +373,33 @@ HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   _cs = cs;
   _rd = rd;
 
+  if (_cs) {
+    export_gpio(_cs);
+    set_gpio_direction(_cs, "out");
+    set_gpio_value(_cs, HIGH);
+  }
+  if (_wr) {
+    export_gpio(_wr);
+    set_gpio_direction(_wr, "out");
+    set_gpio_value(_wr, HIGH);
+  }
+  if (_data) {
+    export_gpio(_data);
+    set_gpio_direction(_data, "out");
+    set_gpio_value(_data, HIGH);
+  }
+  if (_rd) {
+    export_gpio(_rd);
+    set_gpio_direction(_rd, "out");
+    set_gpio_value(_rd, HIGH);
+  }
+  
   for (uint8_t i=0; i<48; i++) {
     ledmatrix[i] = 0;
   }
 }
 
 void HT1632::begin(uint8_t type) {
-  pinMode(_cs, OUTPUT);
-  digitalWrite(_cs, HIGH);
-  pinMode(_wr, OUTPUT);
-  digitalWrite(_wr, HIGH);
-  pinMode(_data, OUTPUT);
-  
-  if (_rd >= 0) {
-    pinMode(_rd, OUTPUT);
-    digitalWrite(_rd, HIGH);
-  }
-
   sendcommand(HT1632_SYS_EN);
   sendcommand(HT1632_LED_ON);
   sendcommand(HT1632_BLINK_OFF);
@@ -371,7 +417,7 @@ void HT1632::setBrightness(uint8_t pwm) {
   sendcommand(HT1632_PWM_CONTROL | pwm);
 }
 
-void HT1632::blink(boolean blinky) {
+void HT1632::blink(bool blinky) {
   if (blinky) 
     sendcommand(HT1632_BLINK_ON);
   else
@@ -387,36 +433,19 @@ void HT1632::clrPixel(uint16_t i) {
 }
 
 void HT1632::dumpScreen() {
-  Serial.println("---------------------------------------");
+  printf("---------------------------------------");
 
   for (uint16_t i=0; i<(WIDTH*HEIGHT/8); i++) {
-    Serial.print("0x");
-    Serial.print(ledmatrix[i], HEX);
-    Serial.print(" ");
-    if (i % 3 == 2) Serial.println();
+    printf("0x%X ",ledmatrix[i]);
+    if (i % 3 == 2) printf("\n");
   }
 
-  Serial.println("\n---------------------------------------");
+  printf("\n---------------------------------------");
 }
 
 void HT1632::writeScreen() {
-
-  digitalWrite(_cs, LOW);
-
-  writedata(HT1632_WRITE, 3);
-  // send with address 0
-  writedata(0, 7);
-
-  for (uint16_t i=0; i<(WIDTH*HEIGHT/8); i+=2) {
-    uint16_t d = ledmatrix[i];
-    d <<= 8;
-    d |= ledmatrix[i+1];
-
-    writedata(d, 16);
-  }
-  digitalWrite(_cs, HIGH);
+  writeRAMburst(0, ledmatrix, (WIDTH*HEIGHT/8));
 }
-
 
 void HT1632::clearScreen() {
   for (uint8_t i=0; i<(WIDTH*HEIGHT/8); i++) {
@@ -425,50 +454,116 @@ void HT1632::clearScreen() {
   writeScreen();
 }
 
-
-void HT1632::writedata(uint16_t d, uint8_t bits) {
-  pinMode(_data, OUTPUT);
-  for (uint8_t i=bits; i > 0; i--) {
-    digitalWrite(_wr, LOW);
-   if (d & _BV(i-1)) {
-     digitalWrite(_data, HIGH);
-   } else {
-     digitalWrite(_data, LOW);
-   }
-  digitalWrite(_wr, HIGH);
+int HT1632::writedata(uint16_t d, uint8_t bits) {
+  uint16_t mask;
+  switch (bits) {
+    case 0: return 0;
+    case 1:
+      mask = BIT0;
+      break;
+    case 2:
+      mask = BIT1;
+      break;
+    case 3:
+      mask = BIT2;
+      break;
+    case 4:
+      mask = BIT3;
+      break;
+    case 5:
+      mask = BIT4;
+      break;
+    case 6:
+      mask = BIT5;
+      break;
+    case 7:
+      mask = BIT6;
+      break;
+    case 8:
+      mask = BIT7;
+      break;
+    case 9:
+      mask = BIT8;
+      break;
+    case 10:
+      mask = BIT9;
+      break;
+    case 11:
+      mask = BITA;
+      break;
+    case 12:
+      mask = BITB;
+      break;
+    case 13:
+      mask = BITC;
+      break;
+    case 14:
+      mask = BITD;
+      break;
+    case 15:
+      mask = BITE;
+      break;
+    case 16:
+      mask = BITF;
+      break;
+    default:
+      return 1;
   }
-  pinMode(_data, INPUT);
+  uint8_t i;
+  for (i = 1; i < bits; i++) {
+    set_gpio_value(_wr, LOW);
+    usleep(HALF_DELAY);
+    if (d & mask) {
+      set_gpio_value(_data, HIGH);
+    } else {
+      set_gpio_value(_data, LOW);
+    }
+    usleep(HALF_DELAY);
+    set_gpio_value(_wr, HIGH);
+    usleep(DELAY);
+    d <<= 1;
+  }
+  set_gpio_value(_wr, LOW);
+  usleep(HALF_DELAY);
+  if (d & mask) {
+    set_gpio_value(_data, HIGH);
+  } else {
+    set_gpio_value(_data, LOW);
+  }
+  usleep(HALF_DELAY);
+  set_gpio_value(_wr, HIGH);
+  usleep(DELAY);
+  return 0;
 }
 
-
-
+void HT1632::writeRAMburst(uint8_t addr, uint8_t *data, uint8_t length) {
+  uint8_t i;
+  set_gpio_value(_cs, LOW);
+  writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
+  writedata(addr, HT1632_ADDRESS_LENGTH);
+  for (i = 0; i < length; i++) {
+    //printf("Writing 0x%X to 0x%X", data[i]&0xF, (addr+i)&0x7F);
+    writedata(data[i], HT1632_WRITE_LENGTH);
+  }
+  set_gpio_value(_cs, HIGH);
+}
 
 void HT1632::writeRAM(uint8_t addr, uint8_t data) {
-  //Serial.print("Writing 0x"); Serial.print(data&0xF, HEX);
-  //Serial.print(" to 0x"); Serial.println(addr & 0x7F, HEX);
+  //printf("Writing 0x%X to 0x%X", data&0xF, addr&0x7F);
 
-  uint16_t d = HT1632_WRITE;
-  d <<= 7;
-  d |= addr & 0x7F;
-  d <<= 4;
-  d |= data & 0xF;
- 
-  digitalWrite(_cs, LOW);
-  writedata(d, 14);
-  digitalWrite(_cs, HIGH);
+  set_gpio_value(_cs, LOW);
+  writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
+  writedata(addr, HT1632_ADDRESS_LENGTH);
+  writedata(_data, HT1632_WRITE_LENGTH);
+  set_gpio_value(_cs, HIGH);
 }
 
 
 void HT1632::sendcommand(uint8_t cmd) {
-  uint16_t data = 0;
-  data = HT1632_COMMAND;
-  data <<= 8;
-  data |= cmd;
-  data <<= 1;
-  
-  digitalWrite(_cs, LOW);
-  writedata(data, 12);
-  digitalWrite(_cs, HIGH);  
+  set_gpio_value(_cs, LOW);
+  writedata(HT1632_COMMAND, HT1632_HEAD_LENGTH);
+  writedata(cmd, HT1632_COMMAND_LENGTH);
+  set_gpio_value(_cs, HIGH);
 }
 
 
