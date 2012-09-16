@@ -43,11 +43,17 @@ void testMatrix(HT1632 *matrix) {
 }
 
 int main(void) {
+  printf("Starting...\n");
   HT1632 matrix = HT1632(DATA, WR, CS);
   matrix.begin(HT1632_COMMON_16NMOS);
   
   sleep(100);
+  printf("Clear\n");
   matrix.clearScreen();
   
+  printf("Test\n");
   testMatrix(&matrix);
+  
+  printf("Done!\n");
+  return 0;
 }
