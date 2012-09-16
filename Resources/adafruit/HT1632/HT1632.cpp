@@ -399,10 +399,7 @@ HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   }
   
   ts.tv_sec = 0;
-  ts.tv_nsec = HALF_DELAY;
-  
-  ts2.tv_sec = 0;
-  ts2.tv_nsec = DELAY;
+  ts.tv_nsec = DELAY;
 }
 
 void HT1632::begin(uint8_t type) {
@@ -518,7 +515,6 @@ int HT1632::writedata(uint16_t d, uint8_t bits) {
   uint8_t i;
   for (i = 1; i < bits; i++) {
     set_gpio_value(_wr, LOW);
-    nanosleep(&ts, NULL);
     if (d & mask) {
       set_gpio_value(_data, HIGH);
     } else {
@@ -526,11 +522,10 @@ int HT1632::writedata(uint16_t d, uint8_t bits) {
     }
     nanosleep(&ts, NULL);
     set_gpio_value(_wr, HIGH);
-    nanosleep(&ts2, NULL);
+    nanosleep(&ts, NULL);
     d <<= 1;
   }
   set_gpio_value(_wr, LOW);
-  nanosleep(&ts, NULL);
   if (d & mask) {
     set_gpio_value(_data, HIGH);
   } else {
@@ -538,7 +533,7 @@ int HT1632::writedata(uint16_t d, uint8_t bits) {
   }
   nanosleep(&ts, NULL);
   set_gpio_value(_wr, HIGH);
-  nanosleep(&ts2, NULL);
+  nanosleep(&ts, NULL);
   return 0;
 }
 

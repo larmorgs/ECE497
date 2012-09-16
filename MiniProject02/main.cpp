@@ -13,6 +13,7 @@ Multiple HT1632's can share data and write pins, but need unique CS pins.
 #define WR 49 //1_17
 #define CS 48 //1_16
 
+/*
 void testMatrix(HT1632 *matrix) {
   for (int i=0; i<24*16; i++) {
     matrix->setPixel(i);
@@ -40,6 +41,11 @@ void testMatrix(HT1632 *matrix) {
     matrix->clrPixel(i);
     matrix->writeScreen();
   }
+}
+*/
+
+void testMatrix(HT1632 *matrix) {
+  matrix->fillScreen();
 }
 
 int main(void) {
