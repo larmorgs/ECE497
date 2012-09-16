@@ -5,27 +5,16 @@ RES_DIR= ../Resources/adafruit/HT1632
 
 TARGETS=main.opp \
 $(RES_DIR)/HT1632.opp \
-<<<<<<< HEAD
-=======
-$(RES_DIR)/serialio.o \
->>>>>>> 41bc465eae780b715c72aa5d2c7c8ff062c52688
 $(RES_DIR)/glcdfont.o
 
 all: $(TARGETS)
 
 clean: 
-<<<<<<< HEAD
 	clear
 	rm -f $(TARGETS)
 
 main.opp: $(RES_DIR)/HT1632.opp
 $(RES_DIR)/HT1632.opp: $(RES_DIR)/glcdfont.o
-=======
-	rm -f $(TARGETS)
-
-main.opp: $(RES_DIR)/HT1632.opp
-$(RES_DIR)/HT1632.opp: $(RES_DIR)/serialio.o $(RES_DIR)/glcdfont.o
->>>>>>> 41bc465eae780b715c72aa5d2c7c8ff062c52688
 
 %.o: %.c
 	$(CC) -c $< -o $@
