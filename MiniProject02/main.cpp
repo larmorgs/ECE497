@@ -9,9 +9,9 @@ and using only 3 pins - data, write and select.
 Multiple HT1632's can share data and write pins, but need unique CS pins.
 */
 
-#define DATA 2
-#define WR 3
-#define CS 4
+#define DATA 117 //3_21
+#define WR 49 //1_17
+#define CS 48 //1_16
 
 void testMatrix(HT1632 *matrix) {
   for (int i=0; i<24*16; i++) {
