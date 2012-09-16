@@ -373,22 +373,22 @@ HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   _cs = cs;
   _rd = rd;
 
-  if (_cs) {
+  if (_cs > 0) {
     export_gpio(_cs);
     set_gpio_direction(_cs, "out");
     set_gpio_value(_cs, HIGH);
   }
-  if (_wr) {
+  if (_wr > 0) {
     export_gpio(_wr);
     set_gpio_direction(_wr, "out");
     set_gpio_value(_wr, HIGH);
   }
-  if (_data) {
+  if (_data > 0) {
     export_gpio(_data);
     set_gpio_direction(_data, "out");
     set_gpio_value(_data, HIGH);
   }
-  if (_rd) {
+  if (_rd > 0) {
     export_gpio(_rd);
     set_gpio_direction(_rd, "out");
     set_gpio_value(_rd, HIGH);
