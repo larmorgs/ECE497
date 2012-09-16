@@ -1,6 +1,7 @@
 #include <stdint.h>
+#include <time.h>
 
-#define HALF_DELAY 1
+#define HALF_DELAY 1000
 #define DELAY (2 * HALF_DELAY)
 
 #define HIGH 1
@@ -71,6 +72,7 @@ class HT1632 {
   
  private:
   int8_t WIDTH, HEIGHT;
+  struct timespec ts, ts2;
   int8_t _data, _cs, _wr, _rd;
   uint8_t ledmatrix[48];     // 16 * 24 / 8
   void sendcommand(uint8_t c);

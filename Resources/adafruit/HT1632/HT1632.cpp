@@ -3,7 +3,7 @@
 #include "../../BoneHeader/BoneHeader.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <time.h>
 
 #define swap(a, b) { uint16_t t = a; a = b; b = t; }
 
@@ -390,13 +390,19 @@ HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   }
   if (_rd > 0) {
     export_gpio(_rd);
-    set_gpio_direction(_rd, "out");
+    set_gpio_direction(_rd, "in");
     set_gpio_value(_rd, HIGH);
   }
   
   for (uint8_t i=0; i<48; i++) {
     ledmatrix[i] = 0;
   }
+  
+  ts.tv_sec = 0;
+  ts.tv_nsec = HALF_DELAY;
+  
+  ts2.tv_sec = 0;
+  ts2.tv_nsec = DELAY;
 }
 
 void HT1632::begin(uint8_t type) {
@@ -512,27 +518,27 @@ int HT1632::writedata(uint16_t d, uint8_t bits) {
   uint8_t i;
   for (i = 1; i < bits; i++) {
     set_gpio_value(_wr, LOW);
-    usleep(HALF_DELAY);
+    nanosleep(&ts, NULL);
     if (d & mask) {
       set_gpio_value(_data, HIGH);
     } else {
       set_gpio_value(_data, LOW);
     }
-    usleep(HALF_DELAY);
+    nanosleep(&ts, NULL);
     set_gpio_value(_wr, HIGH);
-    usleep(DELAY);
+    nanosleep(&ts2, NULL);
     d <<= 1;
   }
   set_gpio_value(_wr, LOW);
-  usleep(HALF_DELAY);
+  nanosleep(&ts, NULL);
   if (d & mask) {
     set_gpio_value(_data, HIGH);
   } else {
     set_gpio_value(_data, LOW);
   }
-  usleep(HALF_DELAY);
+  nanosleep(&ts, NULL);
   set_gpio_value(_wr, HIGH);
-  usleep(DELAY);
+  nanosleep(&ts2, NULL);
   return 0;
 }
 
