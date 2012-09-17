@@ -563,7 +563,7 @@ void HT1632::writeRAM(uint8_t addr, uint8_t data) {
 void HT1632::sendcommand(uint8_t cmd) {
   set_gpio_value(_cs, LOW);
   writedata(HT1632_COMMAND, HT1632_HEAD_LENGTH);
-  writedata(cmd, HT1632_COMMAND_LENGTH);
+  writedata(cmd << 1, HT1632_COMMAND_LENGTH);
   set_gpio_value(_cs, HIGH);
 }
 
