@@ -14,7 +14,7 @@ Multiple HT1632's can share data and write pins, but need unique CS pins.
 #define WR 49 //1_17
 #define CS 48 //1_16
 
-void testMatrix(HT1632LEDMatrix *matrix) {
+void testMatrix2(HT1632LEDMatrix *matrix) {
   //Display "A+"
   matrix->setTextSize(2);
   matrix->setTextColor(1);
@@ -44,7 +44,7 @@ void testMatrix(HT1632LEDMatrix *matrix) {
   matrix->blink(false);
 }
 
-void testMatrix2(HT1632LEDMatrix *matrix) {
+void testMatrix1(HT1632LEDMatrix *matrix) {
   //Display icon
   matrix->drawBitmap(0, 0, icon, matrix->width(), matrix->height(), 1);  
   matrix->writeScreen();
@@ -76,16 +76,17 @@ int main(void) {
   HT1632LEDMatrix matrix = HT1632LEDMatrix(DATA, WR, CS);
   matrix.begin(HT1632_COMMON_16NMOS);
   
-  usleep(100000);
+  printf("Clear\n");
+  matrix.clearScreen();
+  
+  printf("Test #1\n");
+  testMatrix1(&matrix);
+
   printf("Clear\n");
   matrix.clearScreen();
   
   printf("Test2\n");
   testMatrix2(&matrix);
-  matrix.clearScreen();
-  
-  printf("Test1\n");
-  testMatrix(&matrix);
   
   printf("Done!\n");
   return 0;
