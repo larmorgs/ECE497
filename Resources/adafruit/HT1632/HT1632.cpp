@@ -351,8 +351,8 @@ void HT1632LEDMatrix::write(uint8_t c) {
   }
 }*/
 
-
-/*void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y, 
+/*
+void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y, 
 			const uint8_t *bitmap, uint8_t w, uint8_t h,
 			uint8_t color) {
   for (uint8_t j=0; j<h; j++) {
@@ -362,7 +362,8 @@ void HT1632LEDMatrix::write(uint8_t c) {
       }
     }
   }
-}*/
+}
+*/
 
 //////////////////////////////////////////////////////////////////////////
 
