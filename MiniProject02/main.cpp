@@ -13,44 +13,35 @@ Multiple HT1632's can share data and write pins, but need unique CS pins.
 #define WR 49 //1_17
 #define CS 48 //1_16
 
-/*
 void testMatrix(HT1632LEDMatrix *matrix) {
-  for (int i=0; i<24*16; i++) {
-    matrix->setPixel(i);
-    matrix->writeScreen();
-  }
-  
-  // blink!
+  //Display "A+"
+  matrix->setTextSize(2);
+  matrix->setTextColor(1);
+  matrix->write('A');
+  matrix->write('+');
+  matrix->writeScreen();
+  usleep(2000000);
+
+  // Blink!
   matrix->blink(true);
   usleep(2000000);
   matrix->blink(false);
-  
-  // Adjust the brightness down 
-  for (int8_t i=15; i>=0; i--) {
-   matrix->setBrightness(i);
-   usleep(100000);
+
+  // Dim down and then up
+  for (int8_t i = 15; i >= 0; i--) {
+    matrix->setBrightness(i);
+    usleep(100000);
   }
-  // then back up
-  for (uint8_t i=0; i<16; i++) {
-   matrix->setBrightness(i);
-   usleep(100000);
+  for (int8_t i = 0; i < 16; i++) {
+    matrix->setBrightness(i);
+    usleep(100000);
   }
 
-  // Clear it out
-  for (int i=0; i<24*16; i++) {
-    matrix->clrPixel(i);
-    matrix->writeScreen();
-  }
+  // Blink again!
+  matrix->blink(true);
+  usleep(2000000);
+  matrix->blink(false);
 }
-*/
-
-
-void testMatrix(HT1632LEDMatrix *matrix) {
-  matrix->fillScreen();
-  matrix->writeScreen();
-}
-
-
 
 int main(void) {
   printf("Starting...\n");

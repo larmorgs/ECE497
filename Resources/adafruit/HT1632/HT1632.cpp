@@ -319,7 +319,6 @@ void HT1632LEDMatrix::setTextColor(uint8_t c) {
   textcolor = c;
 }
 
-/*
 void HT1632LEDMatrix::write(uint8_t c) {
   if (c == '\n') {
     cursor_y += textsize*8;
@@ -331,13 +330,12 @@ void HT1632LEDMatrix::write(uint8_t c) {
     cursor_x += textsize*6;
   }
 }
-*/
 
 // draw a character
-/*void HT1632LEDMatrix::drawChar(uint8_t x, uint8_t y, char c, 
+void HT1632LEDMatrix::drawChar(uint8_t x, uint8_t y, char c, 
 			      uint16_t color, uint8_t size) {
   for (uint8_t i =0; i<5; i++ ) {
-    uint8_t line = pgm_read_byte(font+(c*5)+i);
+    uint8_t line = font[(c*5)+i];
     for (uint8_t j = 0; j<8; j++) {
       if (line & 0x1) {
 	if (size == 1) // default size
@@ -349,21 +347,19 @@ void HT1632LEDMatrix::write(uint8_t c) {
       line >>= 1;
     }
   }
-}*/
+}
 
-/*
 void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y, 
 			const uint8_t *bitmap, uint8_t w, uint8_t h,
 			uint8_t color) {
   for (uint8_t j=0; j<h; j++) {
     for (uint8_t i=0; i<w; i++ ) {
-      if (pgm_read_byte(bitmap + i + (j/8)*w) & _BV(j%8)) {
+      if (bitmap[i + (j/8)*w] & _BV(j%8)) {
 	drawPixel(x+i, y+j, color);
       }
     }
   }
 }
-*/
 
 //////////////////////////////////////////////////////////////////////////
 
