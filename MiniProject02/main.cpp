@@ -82,6 +82,7 @@ int main(void) {
   
   printf("Test2\n");
   testMatrix2(&matrix);
+  matrix.clearScreen();
   
   printf("Test1\n");
   testMatrix(&matrix);
