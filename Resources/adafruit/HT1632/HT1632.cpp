@@ -8,42 +8,7 @@
 #define swap(a, b) { uint16_t t = a; a = b; b = t; }
 
 uint16_t _BV(uint8_t value) {
-  switch (value) {
-    case 0:
-      return BIT0;
-    case 1:
-      return BIT1;
-    case 2:
-      return BIT2;
-    case 3:
-      return BIT3;
-    case 4:
-      return BIT4;
-    case 5:
-      return BIT5;
-    case 6:
-      return BIT6;
-    case 7:
-      return BIT7;
-    case 8:
-      return BIT8;
-    case 9:
-      return BIT9;
-    case 10:
-      return BITA;
-    case 11:
-      return BITB;
-    case 12:
-      return BITC;
-    case 13:
-      return BITD;
-    case 14:
-      return BITE;
-    case 15:
-      return BITF;
-    default:
-      return 0;
-  }
+  return (uint16_t)BIT0 << value;     
 }
 
 HT1632LEDMatrix::HT1632LEDMatrix(uint8_t data, uint8_t wr, uint8_t cs1) {
@@ -354,7 +319,7 @@ void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y,
 			uint8_t color) {
   for (uint8_t j=0; j<h; j++) {
     for (uint8_t i=0; i<w; i++ ) {
-      if (bitmap[i + (j/8)*w] & _BV(j%8)) {
+      if (bitmap[i/8 + j*(w/8)] & _BV(7-i%8)) {
 	drawPixel(x+i, y+j, color);
       }
     }
