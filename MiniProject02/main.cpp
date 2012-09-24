@@ -46,7 +46,7 @@ void testMatrix(HT1632LEDMatrix *matrix) {
 
 void testMatrix2(HT1632LEDMatrix *matrix) {
   //Display icon
-  matrix->drawBitmap(0, 0, icon1, matrix->width(), matrix->height(), 1);  
+  matrix->drawBitmap(0, 0, icon, matrix->width(), matrix->height(), 1);  
   matrix->writeScreen();
   usleep(2000000);
 

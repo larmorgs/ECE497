@@ -319,7 +319,7 @@ void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y,
 			uint8_t color) {
   for (uint8_t j=0; j<h; j++) {
     for (uint8_t i=0; i<w; i++ ) {
-      if (bitmap[i/8 + j*(w/8)] & _BV(7-i%8)) {
+      if (bitmap[i/8 + j*(w/8)] & _BV(i%8)) {
 	drawPixel(x+i, y+j, color);
       }
     }
