@@ -18,14 +18,8 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#if (ARDUINO >= 100)
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
-
-#include "Wire.h"
-#include "Adafruit_GFX.h"
+#include "../Adafruit-GFX-Library/Adafruit_GFX.h"
+#include <stdlib.h>
 
 #define LED_ON 1
 #define LED_OFF 0
@@ -112,8 +106,8 @@ class Adafruit_7segment : public Adafruit_LEDBackpack {
   void println(void);
   
   void writeDigitRaw(uint8_t x, uint8_t bitmask);
-  void writeDigitNum(uint8_t x, uint8_t num, boolean dot = false);
-  void drawColon(boolean state);
+  void writeDigitNum(uint8_t x, uint8_t num, bool dot = false);
+  void drawColon(bool state);
   void printNumber(long, uint8_t = 2);
   void printFloat(double, uint8_t = 2, uint8_t = DEC);
   void printError(void);
