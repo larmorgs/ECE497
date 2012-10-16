@@ -25,7 +25,7 @@ class Adafruit_GFX {
   Adafruit_GFX(int16_t w, int16_t h);
 
   // this must be defined by the subclass
-  virtual void drawPixel(int16_t x, int16_t y, uint16_t color);
+  virtual void drawPixel(int16_t x, int16_t y, uint16_t color) = 0;
   virtual void invertDisplay(bool i);
 
   // these are 'generic' drawing functions, so we can share them!
