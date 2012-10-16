@@ -19,7 +19,7 @@ All text above must be included in any redistribution
 
 using namespace std;
 
-void Adafruit_GFX::constructor(int16_t w, int16_t h) {
+Adafruit_GFX::Adafruit_GFX(int16_t w, int16_t h) {
   _width = WIDTH = w;
   _height = HEIGHT = h;
 
@@ -29,7 +29,6 @@ void Adafruit_GFX::constructor(int16_t w, int16_t h) {
   textcolor = textbgcolor = 0xFFFF;
   wrap = true;
 }
-
 
 // draw a circle outline
 void Adafruit_GFX::drawCircle(int16_t x0, int16_t y0, int16_t r, 

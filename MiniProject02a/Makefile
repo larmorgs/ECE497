@@ -1,12 +1,13 @@
 CC=gcc
 CCPP=g++
 
-RES_DIR= ../Adafruit-GFX-Library/
+RES_DIR= ../Resources/adafruit
 
-TARGETS=Adafruit_LEDBackpack \
-Adafruit_LEDBackpack.opp \
-$(RES_DIR)/Adafruit_GFX.opp \
-$(RES_DIR)/glcdfont.o
+TARGETS= bicolor8x8 \
+bicolor8x8.opp \
+$(RES_DIR)/HT16K33/Adafruit_LEDBackpack.opp \
+$(RES_DIR)/Adafruit-GFX-Library/Adafruit_GFX.opp \
+$(RES_DIR)/Adafruit-GFX-Library/glcdfont.o
 
 all: $(TARGETS)
 
@@ -14,8 +15,10 @@ clean:
 	clear
 	rm -f $(TARGETS)
 
-Adafruit_LEDBackpack: Adafruit_LEDBackpack.opp $(RES_DIR)/Adafruit_GFX.opp $(RES_DIR)/glcdfont.o
+bicolor8x8: bicolor8x8.opp $(RES_DIR)/HT16K33/Adafruit_LEDBackpack.opp $(RES_DIR)/Adafruit-GFX-Library/Adafruit_GFX.opp
 	$(CCPP) $^ -o $@
+
+$(RES_DIR)/HT16K33/Adafruit_LEDBackpack.opp: $(RES_DIR)/Adafruit-GFX-Library/Adafruit_GFX.opp $(RES_DIR)/Adafruit-GFX-Library/glcdfont.o
 
 %.o: %.c
 	$(CC) -c $< -o $@
