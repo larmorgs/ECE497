@@ -21,6 +21,14 @@
 #include "Adafruit_LEDBackpack.h"
 #include "../Adafruit-GFX-Library/Adafruit_GFX.h"
 
+#include <cerrno>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+#include <fcntl.h>
+#include "../../../../exercises/i2c/i2c-dev.h"
+
 static const uint8_t numbertable[] = { 
 	0x3F, /* 0 */
 	0x06, /* 1 */
@@ -40,19 +48,84 @@ static const uint8_t numbertable[] = {
 	0x71, /* F */
 };
 
+#define I2C_BUS_FILE "/dev/i2c-3"
+
+void i2cWriteSingleByte(uint8_t addr, uint8_t data) {
+	int res, file;
+
+	file = open(I2C_BUS_FILE, O_RDWR);
+	if (file<0) {
+		if (errno == ENOENT) {
+			fprintf(stderr, "Error: Could not open file "
+				I2C_BUS_FILE ": %s\n", strerror(ENOENT));
+		} else {
+			fprintf(stderr, "Error: Could not open file "
+				I2C_BUS_FILE ": %s\n", strerror(errno));
+			if (errno == EACCES)
+				fprintf(stderr, "Run as root?\n");
+		}
+		exit(-1);
+	}
+
+	if (ioctl(file, I2C_SLAVE, addr) < 0) {
+		fprintf(stderr,
+			"Error: Could not set address to 0x%02x: %s\n",
+			addr, strerror(errno));
+		exit(-2);
+	}
+
+	res = i2c_smbus_write_byte(file, data);
+	close(file);
+
+	if (res < 0) {
+		fprintf(stderr, "Error: Write failed on %d\n", data);
+		exit(-3);
+	}
+}
+
+void i2cWriteBurstByteData(uint8_t addr, uint8_t command, uint16_t length, uint8_t *data) {
+	int res, file;
+
+	file = open(I2C_BUS_FILE, O_RDWR);
+	if (file<0) {
+		if (errno == ENOENT) {
+			fprintf(stderr, "Error: Could not open file "
+				I2C_BUS_FILE ": %s\n", strerror(ENOENT));
+		} else {
+			fprintf(stderr, "Error: Could not open file "
+				I2C_BUS_FILE ": %s\n", strerror(errno));
+			if (errno == EACCES)
+				fprintf(stderr, "Run as root?\n");
+		}
+		exit(-1);
+	}
+
+	if (ioctl(file, I2C_SLAVE, addr) < 0) {
+		fprintf(stderr,
+			"Error: Could not set address to 0x%02x: %s\n",
+			addr, strerror(errno));
+		exit(-2);
+	}
+
+	res = i2c_smbus_write_block_data(file, command, length, data);
+	close(file);
+
+	if (res < 0) {
+		fprintf(stderr, "Error: Write failed on %s\n", data);
+		exit(-3);
+	}
+}
+
 void Adafruit_LEDBackpack::setBrightness(uint8_t b) {
   if (b > 15) b = 15;
-  //Wire.beginTransmission(i2c_addr);
-  //Wire.write(0xE0 | b);
-  //Wire.endTransmission();  
+  
+  i2cWriteSingleByte(i2c_addr, 0xE0 | b);
 }
 
 void Adafruit_LEDBackpack::blinkRate(uint8_t b) {
-  //Wire.beginTransmission(i2c_addr);
   if (b > 3) b = 0; // turn off if not sure
   
-  //Wire.write(HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAYON | (b << 1)); 
-  //Wire.endTransmission();
+  i2cWriteSingleByte(i2c_addr, HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAYON | (b << 1));
 }
 
 Adafruit_LEDBackpack::Adafruit_LEDBackpack(void) {
@@ -61,25 +134,15 @@ Adafruit_LEDBackpack::Adafruit_LEDBackpack(void) {
 void Adafruit_LEDBackpack::begin(uint8_t _addr = 0x70) {
   i2c_addr = _addr;
 
-  //Wire.begin();
+  i2cWriteSingleByte(i2c_addr, 0x21);
 
-  //Wire.beginTransmission(i2c_addr);
-  //Wire.write(0x21);  // turn on oscillator
-  //Wire.endTransmission();
   blinkRate(HT16K33_BLINK_OFF);
   
   setBrightness(15); // max brightness
 }
 
 void Adafruit_LEDBackpack::writeDisplay(void) {
-  //Wire.beginTransmission(i2c_addr);
-  //Wire.write((uint8_t)0x00); // start at address $00
-
-  for (uint8_t i=0; i<8; i++) {
-    //Wire.write(displaybuffer[i] & 0xFF);    
-    //Wire.write(displaybuffer[i] >> 8);    
-  }
-  //Wire.endTransmission();  
+  i2cWriteBurstByteData(i2c_addr, 0x00, 16, (uint8_t *)displaybuffer);
 }
 
 void Adafruit_LEDBackpack::clear(void) {
