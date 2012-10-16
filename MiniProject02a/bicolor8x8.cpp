@@ -29,7 +29,7 @@ void setup() {
   //Serial.begin(9600);
   //Serial.println("8x8 LED Matrix Test");
   
-  matrix.begin(0x70);  // pass in the address
+  matrix.begin(0x77);  // pass in the address
 }
 
 static uint8_t smile_bmp[]={0x3C, 0x42, 0x95, 0xA1, 0xA1, 0x95, 0x42, 0x3C};
