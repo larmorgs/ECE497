@@ -10,9 +10,10 @@ and using only 3 pins - data, write and select.
 Multiple HT1632's can share data and write pins, but need unique CS pins.
 */
 
-#define DATA 117 //3_21
-#define WR 49 //1_17
-#define CS 48 //1_16
+#define BANK 1
+#define DATA 28 //1_28
+#define WR 17 //1_17
+#define CS 16 //1_16
 
 void testMatrix2(HT1632LEDMatrix *matrix) {
   //Display "A+"
@@ -73,7 +74,7 @@ void testMatrix1(HT1632LEDMatrix *matrix) {
 
 int main(void) {
   printf("Starting...\n");
-  HT1632LEDMatrix matrix = HT1632LEDMatrix(DATA, WR, CS);
+  HT1632LEDMatrix matrix = HT1632LEDMatrix(BANK, DATA, WR, CS);
   matrix.begin(HT1632_COMMON_16NMOS);
   
   printf("Clear\n");

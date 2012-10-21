@@ -1,6 +1,5 @@
 #include "HT1632.h"
 #include "glcdfont.c"
-#include "../../BoneHeader/BoneHeader.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -11,47 +10,47 @@ uint16_t _BV(uint8_t value) {
   return (uint16_t)BIT0 << value;     
 }
 
-HT1632LEDMatrix::HT1632LEDMatrix(uint8_t data, uint8_t wr, uint8_t cs1) {
+HT1632LEDMatrix::HT1632LEDMatrix(uint8_t bank, uint8_t data, uint8_t wr, uint8_t cs1) {
   matrices = (HT1632 *)malloc(sizeof(HT1632));
 
-  matrices[0] = HT1632(data, wr, cs1);
+  matrices[0] = HT1632(bank, data, wr, cs1);
   matrixNum  = 1;
   _width = 24 * matrixNum;
   _height = 16;
 }
 
-HT1632LEDMatrix::HT1632LEDMatrix(uint8_t data, uint8_t wr, 
+HT1632LEDMatrix::HT1632LEDMatrix(uint8_t bank, uint8_t data, uint8_t wr, 
 				 uint8_t cs1, uint8_t cs2) {
   matrices = (HT1632 *)malloc(2 * sizeof(HT1632));
 
-  matrices[0] = HT1632(data, wr, cs1);
-  matrices[1] = HT1632(data, wr, cs2);
+  matrices[0] = HT1632(bank, data, wr, cs1);
+  matrices[1] = HT1632(bank, data, wr, cs2);
   matrixNum  = 2;
   _width = 24 * matrixNum;
   _height = 16;
 }
 
-HT1632LEDMatrix::HT1632LEDMatrix(uint8_t data, uint8_t wr, 
+HT1632LEDMatrix::HT1632LEDMatrix(uint8_t bank, uint8_t data, uint8_t wr, 
 				 uint8_t cs1, uint8_t cs2, uint8_t cs3) {
   matrices = (HT1632 *)malloc(3 * sizeof(HT1632));
 
-  matrices[0] = HT1632(data, wr, cs1);
-  matrices[1] = HT1632(data, wr, cs2);
-  matrices[2] = HT1632(data, wr, cs3);
+  matrices[0] = HT1632(bank, data, wr, cs1);
+  matrices[1] = HT1632(bank, data, wr, cs2);
+  matrices[2] = HT1632(bank, data, wr, cs3);
   matrixNum  = 3;
   _width = 24 * matrixNum;
   _height = 16;
 }
 
-HT1632LEDMatrix::HT1632LEDMatrix(uint8_t data, uint8_t wr, 
+HT1632LEDMatrix::HT1632LEDMatrix(uint8_t bank, uint8_t data, uint8_t wr, 
 				 uint8_t cs1, uint8_t cs2, 
 				 uint8_t cs3, uint8_t cs4) {
   matrices = (HT1632 *)malloc(4 * sizeof(HT1632));
 
-  matrices[0] = HT1632(data, wr, cs1);
-  matrices[1] = HT1632(data, wr, cs2);
-  matrices[2] = HT1632(data, wr, cs3);
-  matrices[3] = HT1632(data, wr, cs4);
+  matrices[0] = HT1632(bank, data, wr, cs1);
+  matrices[1] = HT1632(bank, data, wr, cs2);
+  matrices[2] = HT1632(bank, data, wr, cs3);
+  matrices[3] = HT1632(bank, data, wr, cs4);
   matrixNum  = 4;
   _width = 24 * matrixNum;
   _height = 16;
@@ -329,31 +328,25 @@ void HT1632LEDMatrix::drawBitmap(uint8_t x, uint8_t y,
 //////////////////////////////////////////////////////////////////////////
 
 
-HT1632::HT1632(int8_t data, int8_t wr, int8_t cs, int8_t rd) {
+HT1632::HT1632(uint8_t bank, int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   _data = data;
   _wr = wr;
   _cs = cs;
   _rd = rd;
 
+  gpiobank = new GPIO_MMAP(bank);
+
   if (_cs > 0) {
-    export_gpio(_cs);
-    set_gpio_value(_cs, HIGH);
-    set_gpio_direction(_cs, "out");
+    gpiobank->write(_cs, 1);
   }
   if (_wr > 0) {
-    export_gpio(_wr);
-    set_gpio_value(_wr, HIGH);
-    set_gpio_direction(_wr, "out");
+    gpiobank->write(_wr, 1);
   }
   if (_data > 0) {
-    export_gpio(_data);
-    set_gpio_value(_data, HIGH);
-    set_gpio_direction(_data, "out");
+    gpiobank->write(_data, 1);
   }
-  if (_rd > 0) {
-    export_gpio(_rd);
-    set_gpio_value(_rd, HIGH);
-    set_gpio_direction(_rd, "out");
+  if (_rd > 0) {  
+    gpiobank->write(_rd, 1);
   }
   
   for (uint8_t i=0; i<48; i++) {
@@ -476,57 +469,57 @@ int HT1632::writedata(uint16_t d, uint8_t bits) {
   }
   uint8_t i;
   for (i = 1; i < bits; i++) {
-    set_gpio_value(_wr, LOW);
+    gpiobank->write(_wr, 0);
     if (d & mask) {
-      set_gpio_value(_data, HIGH);
+      gpiobank->write(_data, 1);
     } else {
-      set_gpio_value(_data, LOW);
+      gpiobank->write(_data, 0);
     }
     nanosleep(&ts, NULL);
-    set_gpio_value(_wr, HIGH);
+    gpiobank->write(_wr, 1);
     nanosleep(&ts, NULL);
     d <<= 1;
   }
-  set_gpio_value(_wr, LOW);
+  gpiobank->write(_wr, LOW);
   if (d & mask) {
-    set_gpio_value(_data, HIGH);
+    gpiobank->write(_data, 1);
   } else {
-    set_gpio_value(_data, LOW);
+    gpiobank->write(_data, 0);
   }
   nanosleep(&ts, NULL);
-  set_gpio_value(_wr, HIGH);
+  gpiobank->write(_wr, 1);
   nanosleep(&ts, NULL);
   return 0;
 }
 
 void HT1632::writeRAMburst(uint8_t addr, uint8_t *data, uint8_t length) {
   uint8_t i;
-  set_gpio_value(_cs, LOW);
+  gpiobank->write(_cs, 0);
   writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
   writedata(addr, HT1632_ADDRESS_LENGTH);
   for (i = 0; i < length; i++) {
     //printf("Writing 0x%X to 0x%X\n", data[i], (addr+i)&0x7F);
     writedata(data[i], 2*HT1632_WRITE_LENGTH);
   }
-  set_gpio_value(_cs, HIGH);
+  gpiobank->write(_cs, 1);
 }
 
 void HT1632::writeRAM(uint8_t addr, uint8_t data) {
   //printf("Writing 0x%X to 0x%X\n", data&0xF, addr&0x7F);
 
-  set_gpio_value(_cs, LOW);
+  gpiobank->write(_cs, 0);
   writedata(HT1632_WRITE, HT1632_HEAD_LENGTH);
   writedata(addr, HT1632_ADDRESS_LENGTH);
   writedata(data, HT1632_WRITE_LENGTH);
-  set_gpio_value(_cs, HIGH);
+  gpiobank->write(_cs, 1);
 }
 
 
 void HT1632::sendcommand(uint8_t cmd) {
-  set_gpio_value(_cs, LOW);
+  gpiobank->write(_cs, 0);
   writedata(HT1632_COMMAND, HT1632_HEAD_LENGTH);
   writedata((uint16_t)cmd << 1, HT1632_COMMAND_LENGTH);
-  set_gpio_value(_cs, HIGH);
+  gpiobank->write(_cs, 1);
 }
 
 
