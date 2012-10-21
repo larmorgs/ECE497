@@ -336,9 +336,13 @@ HT1632::HT1632(uint8_t bank, int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   _rd = rd;
 
   export_gpio(bank * 32 + _data);
+  set_gpio_direction(bank * 32 + _data, "out");
   export_gpio(bank * 32 + _wr);
+  set_gpio_direction(bank * 32 + _wr, "out");
   export_gpio(bank * 32 + _cs);
+  set_gpio_direction(bank * 32 + _cs, "out");
   export_gpio(bank * 32 + _rd);
+  set_gpio_direction(bank * 32 + _rd, "out");
   
   gpiobank = new GPIO_MMAP(bank);
 
