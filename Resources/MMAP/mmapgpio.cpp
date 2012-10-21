@@ -47,8 +47,8 @@ uint8_t GPIO_MMAP::read(uint8_t gpioNum) {
 
 void GPIO_MMAP::write(uint8_t gpioNum, uint8_t out) {
   if (out == 1) {
-    value[GPIO_DATAOUT/4] |= out << gpioNum;
+    value[GPIO_DATAOUT/4] |= (1 << gpioNum);
   } else {
-    value[GPIO_DATAOUT/4] &= ~(out << gpioNum);
+    value[GPIO_DATAOUT/4] &= ~(1 << gpioNum);
   }
 }  
