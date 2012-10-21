@@ -31,14 +31,14 @@
 #define     SAMPLE_RATE      48000
 
 //* The gain (0-100) of the left channel **
-#define     LEFT_GAIN        50
+#define     LEFT_GAIN        100
 
 //* The gain (0-100) of the right channel **
-#define     RIGHT_GAIN       50
+#define     RIGHT_GAIN       100
 
 //*  Parameters for audio thread execution **
 #define     BLOCKSIZE        48000
-#define     RECORDTIME       500
+#define     RECORDTIME       512
 
 //*******************************************************************************
 //*  audio_thread_fxn                                                          **
@@ -205,15 +205,14 @@ void *audio_thread_fxn( void *envByRef )
             status = AUDIO_THREAD_FAILURE;
             goto  cleanup ;
         }
+        memcpy(outputBuffer, inputBuffer, blksize);
         if ( envPtr->replay == 1 ) {
             int i;
             for (i = 0; i < blksize; i++) {
-                outputBuffer[i] = (char)(((signed int)recordBuffer[((count%RECORDTIME)*blksize)+i]) + 
-                                        ((signed int)inputBuffer[i]));
+                outputBuffer[i] += recordBuffer[((count%RECORDTIME)*blksize)+i];
             }
         } else {
-            memcpy(outputBuffer, inputBuffer, blksize);  
-            memcpy(recordBuffer+((count%RECORDTIME)*blksize), inputBuffer, blksize);
+            memcpy((signed int)recordBuffer+(signed int)((count%RECORDTIME)*blksize), inputBuffer, blksize);
         }
         
         // Write output buffer into ALSA output device

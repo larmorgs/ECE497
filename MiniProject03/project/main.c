@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     noecho();
 
     /* Make video frame buffer visible */
-    system("cd ..; ./vid1Show");
+    system("cd ..; ./vid2Show");
 
     /* Create a thread for video */
     DBG( "Creating video thread\n" );
@@ -113,14 +113,14 @@ int main(int argc, char *argv[])
             count = 0;
             video_env.replay = 1;
             audio_env.replay = 1;
-            system("cd ..; ./resetVideo");
-            system("cd ..; ./vid2Show");
+            //system("cd ..; ./resetVideo");
+            //system("cd ..; ./vid2Show");
         }
         if (count++ == 5 && audio_env.replay == 1) {
             video_env.replay = 0;
             audio_env.replay = 0;
-            system("cd ..; ./resetVideo");
-            system("cd ..; ./vid1Show");
+            //system("cd ..; ./resetVideo");
+            //system("cd ..; ./vid1Show");
         }
         sleep(1);
     }
