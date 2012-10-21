@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include "../../BoneHeader/BoneHeader.h"
 
 #define swap(a, b) { uint16_t t = a; a = b; b = t; }
 
@@ -334,6 +335,11 @@ HT1632::HT1632(uint8_t bank, int8_t data, int8_t wr, int8_t cs, int8_t rd) {
   _cs = cs;
   _rd = rd;
 
+  export_gpio(bank * 32 + _data);
+  export_gpio(bank * 32 + _wr);
+  export_gpio(bank * 32 + _cs);
+  export_gpio(bank * 32 + _rd);
+  
   gpiobank = new GPIO_MMAP(bank);
 
   if (_cs > 0) {
