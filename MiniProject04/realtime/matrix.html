@@ -15,7 +15,11 @@
     <button id="connect" onClick='connect()'/>Connect</button>
     <button id="disconnect" onClick='disconnect()'>Disconnect</button>
 
-<button id="update" onClick='update()'/>Update</button>
+<p>
+<button id="pic1" onClick='pic1()'/>Pic 1</button>
+<button id="pic2" onClick='pic2()'/>Pic 2</button>
+<button id="pic3" onClick='pic3()'/>Pic 3</button>
+</p>
 
 <p>
 
@@ -33,10 +37,7 @@ By <i>Greg Larmore</i>
     <script>
 
     var socket;
-    var firstconnect = true,
-        size = 100,
-        picture = [];
-    picture[size] = 0;
+    var firstconnect = true;
 
     function connect() {
       if(firstconnect) {
@@ -61,8 +62,16 @@ By <i>Greg Larmore</i>
       socket.disconnect();
     }
 
-    function update() {
+    function pic1() {
       socket.emit('update', "255 48 6 63 16 0 31 159 4 31 31 5 31 15 9 31 15 8 63 0 26 255 13 50 255 15 52 255 7 100 255 7 100 127 8 116 63 15 116 63 15 60 63 7 15 127 48 7");
+    }
+
+    function pic2() {
+      socket.emit('update', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48");
+    }
+
+    function pic3() {
+      socket.emit('update', "255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0");
     }
 
     function status_update(txt){
