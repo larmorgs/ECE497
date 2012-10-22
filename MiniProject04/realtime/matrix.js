@@ -65,6 +65,10 @@ io.sockets.on('connection', function (socket) {
             fs.writeFile(ledPath, data);
         });
     });
+    
+    socket.on('update', function (data) {
+        console.log(data);
+    });
 
     socket.on('disconnect', function () {
         console.log("Connection " + socket.id + " terminated.");
