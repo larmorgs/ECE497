@@ -69,7 +69,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('update', function (data) {
         console.log(data);
         var test = require('child_process');
-        var output = child_process.spawn('../main');     
+        var output = test.spawn('../main');     
     });
 
     socket.on('disconnect', function () {
