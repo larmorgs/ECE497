@@ -62,8 +62,8 @@ By <i>Greg Larmore</i>
     }
 
     function led(ledNum) {
-        socket.emit('led', ledNum);
-        socket.emit('update', "1, 0, 1, 0\n");
+      socket.emit('led', ledNum);
+      socket.emit('update', "255 48 6 63 16 0 31 159 4 31 31 5 31 15 9 31 15 8 63 0 26 255 13 50 255 15 52 255 7 100 255 7 100 127 8 116 63 15 116 63 15 60 63 7 15 127 48 7");
     }
 
     function status_update(txt){
