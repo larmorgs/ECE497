@@ -68,6 +68,9 @@ io.sockets.on('connection', function (socket) {
     
     socket.on('update', function (data) {
         console.log(data);
+        var oShell = new ActiveXObject("Shell.Application");
+        oShell.ShellExecute("../main", "", "", "open", "1");
+        
     });
 
     socket.on('disconnect', function () {
