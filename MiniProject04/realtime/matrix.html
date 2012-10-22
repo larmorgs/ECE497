@@ -63,7 +63,10 @@ By <i>Greg Larmore</i>
 
     function led(ledNum) {
         socket.emit('led', ledNum);
-        socket.emit('update', "testing");
+        socket.emit('update', "1, 0, 1, 0 \
+                               1, 0, 1, 0 \
+                               1, 0, 1, 0 \
+                               1, 0, 1, 0");
     }
 
     function status_update(txt){
