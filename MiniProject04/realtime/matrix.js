@@ -67,9 +67,25 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('update', function (data) {
-        console.log(data);
-        var test = require('child_process');
-        var output = test.spawn('../main');     
+      console.log('Calling update function');
+      console.log(data);
+      var process = require('child_process'),
+          main = process.spawn('../main', [data]);
+
+      main.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);	
+      });
+
+      main.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);	
+      });
+
+      main.on('exit', function (code) {
+        if (code !== 0) {
+          console.log('Update function exited with code ' + code);
+        }
+      });
+
     });
 
     socket.on('disconnect', function () {

@@ -1,6 +1,7 @@
 #include "../Resources/adafruit/HT1632/HT1632.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 #include "icons.c"
 
 /* 
@@ -15,7 +16,8 @@ This demo outputs the data fed into stdin to the HT1632 for the 16x24 LED matrix
 unsigned char data[48];
 
 main(int argc, char *argv[]) {
-  if (argc != 49) {
+  if (argc != 2) {
+    printf("Wrong number of arguments %d\n", argc);
     return 1;
   } else {
     printf("Starting...\n");
@@ -24,8 +26,11 @@ main(int argc, char *argv[]) {
     
     printf("Clear\n");
     matrix.clearScreen();
-    for (int i = 0; i < 48; i++) {
-      sscanf(argv[i+1], "%hhu", &data[i]);
+    int i = 0;
+    char *token = strtok(argv[1], " ");
+    while (token && i < 48) {
+      sscanf(token, "%hhu", &data[i++]);
+      token = strtok(NULL, " ");
     }
     printf("Drawing\n");
     matrix.drawBitmap(0, 0, data, matrix.width(), matrix.height(), 1);  
