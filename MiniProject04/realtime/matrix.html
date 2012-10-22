@@ -27,7 +27,6 @@ Try pushing the button.
     <div><p id="status">Waiting for input</p></div>
     <a href="http://www.ti.com/sitara" target="_blank">
         <img src="hdr_ti_logo.gif" width=200 align="right"></a>
-    <div><p id="message">message</p></div> 
 By <i>Greg Larmore</i>
 <br/>
 
@@ -43,8 +42,6 @@ By <i>Greg Larmore</i>
       if(firstconnect) {
         socket = io.connect(null);
 
-        socket.on('message', function(data)
-            { status_update("Received: message");});
         socket.on('connect', function()
             { status_update("Connected to Server"); });
         socket.on('disconnect', function()
@@ -53,8 +50,6 @@ By <i>Greg Larmore</i>
             { status_update("Reconnected to Server"); });
         socket.on('reconnecting', function( nextRetry )
             { status_update("Reconnecting in " + nextRetry/1000 + " s"); });
-        socket.on('reconnect_failed', function()
-            { message("Reconnect Failed"); });
         firstconnect = false;
       }
       else {
