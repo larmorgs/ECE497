@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Adafruit: 16x24 Red LED Matrix Panel</title>
+
+    <script src="/json.js"></script> <!-- for ie -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <link href="layout.css" rel="stylesheet" type="text/css">
+    <script src="jquery.js"></script>
+  </head>
+  <body>
+    <h1>Adafruit: 16x24 Red LED Matrix Panel <a href="http://Rose-Hulman.edu" target="_blank">
+        <img src="RoseLogo96.png" width=200 style="float:right"></a></h1>
+    <button id="connect" onClick='connect()'/>Connect</button>
+    <button id="disconnect" onClick='disconnect()'>Disconnect</button>
+
+<button id="TOGGLE" onClick='led(1)'/>LED 1</button>
+
+<p>
+
+<b> <a href="http://elinux.org/Adafruit:_16x24_Red_LED_Matrix_Panel" target="_blank">Adafruit: 16x24 Red LED Matrix Panel</a>.</b>
+Try pushing the button.
+</p>
+    <a href="http://beagleboard.org" target="_blank">
+        <img src="beagle-hd-logo.gif" width=200 align="right"></a>
+    <div><p id="status">Waiting for input</p></div>
+    <a href="http://www.ti.com/sitara" target="_blank">
+        <img src="hdr_ti_logo.gif" width=200 align="right"></a>
+    <div><p id="message">message</p></div> 
+By <i>Greg Larmore</i>
+<br/>
+
+    <script>
+
+    var socket;
+    var firstconnect = true,
+        size = 100,
+        picture = [];
+    picture[size] = 0;
+
+    function connect() {
+      if(firstconnect) {
+        socket = io.connect(null);
+
+        socket.on('message', function(data)
+            { status_update("Received: message");});
+        socket.on('connect', function()
+            { status_update("Connected to Server"); });
+        socket.on('disconnect', function()
+            { status_update("Disconnected from Server"); });
+        socket.on('reconnect', function()
+            { status_update("Reconnected to Server"); });
+        socket.on('reconnecting', function( nextRetry )
+            { status_update("Reconnecting in " + nextRetry/1000 + " s"); });
+        socket.on('reconnect_failed', function()
+            { message("Reconnect Failed"); });
+        firstconnect = false;
+      }
+      else {
+        socket.socket.reconnect();
+      }
+    }
+
+    function disconnect() {
+      socket.disconnect();
+    }
+
+    function led(ledNum) {
+        socket.emit('led', ledNum);
+    }
+
+    function status_update(txt){
+      document.getElementById('status').innerHTML = txt;
+    }
+
+    connect();
+
+</script>
+
+  </body>
+</html>
