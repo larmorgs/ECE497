@@ -35,27 +35,6 @@ main(int argc, char *argv[]) {
     printf("Drawing\n");
     matrix.drawBitmap(0, 0, data, matrix.width(), matrix.height(), 1);  
     matrix.writeScreen();
-    usleep(2000000);
-
-    // Blink!
-    matrix.blink(true);
-    usleep(2000000);
-    matrix.blink(false);
-
-    // Dim down and then up
-    for (int8_t i = 15; i >= 0; i--) {
-      matrix.setBrightness(i);
-      usleep(100000);
-    }
-    for (int8_t i = 0; i < 16; i++) {
-      matrix.setBrightness(i);
-      usleep(100000);
-    }
-
-    // Blink again!
-    matrix.blink(true);
-    usleep(2000000);
-    matrix.blink(false);
     printf("Done!\n");
     return 0;
   }

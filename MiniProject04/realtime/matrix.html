@@ -15,7 +15,7 @@
     <button id="connect" onClick='connect()'/>Connect</button>
     <button id="disconnect" onClick='disconnect()'>Disconnect</button>
 
-<button id="TOGGLE" onClick='led(1)'/>LED 1</button>
+<button id="update" onClick='update()'/>Update</button>
 
 <p>
 
@@ -61,8 +61,7 @@ By <i>Greg Larmore</i>
       socket.disconnect();
     }
 
-    function led(ledNum) {
-      socket.emit('led', ledNum);
+    function update() {
       socket.emit('update', "255 48 6 63 16 0 31 159 4 31 31 5 31 15 9 31 15 8 63 0 26 255 13 50 255 15 52 255 7 100 255 7 100 127 8 116 63 15 116 63 15 60 63 7 15 127 48 7");
     }
 

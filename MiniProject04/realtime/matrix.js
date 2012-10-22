@@ -53,36 +53,24 @@ io.sockets.on('connection', function (socket) {
 //    console.log("socket: " + socket);
 
     // now that we have our connected 'socket' object, we can 
-    // define its event handlers
-
-    socket.on('led', function (ledNum) {
-        var ledPath = "/sys/class/leds/beaglebone::usr" + ledNum + "/brightness";
-//        console.log('LED: ' + ledPath);
-        fs.readFile(ledPath, 'utf8', function (err, data) {
-            if(err) throw err;
-            data = data.substring(0,1) === "1" ? "0" : "1";
-//            console.log("LED%d: %s", ledNum, data);
-            fs.writeFile(ledPath, data);
-        });
-    });
-    
+    // define its event handlers    
     socket.on('update', function (data) {
-      console.log('Calling update function');
-      console.log(data);
+      //console.log('Calling update function');
+      //console.log(data);
       var process = require('child_process'),
           main = process.spawn('../main', [data]);
 
       main.stdout.on('data', function (data) {
-        console.log('stdout: ' + data);	
+        //console.log('stdout: ' + data);	
       });
 
       main.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);	
+        //console.log('stderr: ' + data);	
       });
 
       main.on('exit', function (code) {
         if (code !== 0) {
-          console.log('Update function exited with code ' + code);
+          //console.log('Update function exited with code ' + code);
         }
       });
 
