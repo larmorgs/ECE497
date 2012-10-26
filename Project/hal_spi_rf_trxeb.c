@@ -12,7 +12,13 @@
  */
 #include "hal_spi_rf_trxeb.h"
 #include <stdint.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <linux/spi/spidev.h>
+#include <fcntl.h>
 
+static const char *device = "/dev/spidev2.0";
+static int fd;
 
 /******************************************************************************
  * LOCAL FUNCTIONS
@@ -41,7 +47,10 @@ static void trxReadWriteBurstSingle(uint8_t addr,uint8_t *pData,uint16_t len) ;
  */
 void trxRfSpiInterfaceInit(void)
 {
-
+  fd = open(device, O_RDWR);
+  /*if (fd < 0) {
+  
+  }*/
 }
 
 
@@ -68,20 +77,47 @@ void trxRfSpiInterfaceInit(void)
  */
 rfStatus_t trx8BitRegAccess(uint8_t accessType, uint8_t addrByte, uint8_t *pData, uint16_t len)
 {
-  uint8_t readValue;
+  uint8_t temp = accessType|addrByte;
 
-  /* Pull CS_N low and wait for SO to go low before communication starts */
-  TRXEM_SPI_BEGIN();
-  //while(P1IN & BIT1);
-  /* send register address byte */
+  uint8_t ret = 0;
+  uint8_t rx = 0;
+  
+  uint8_t trash = 0;
+  
+  struct spi_ioc_transfer tr = {
+		.tx_buf = (unsigned long)&temp,
+		.rx_buf = (unsigned long)&rx,
+		.len = len,
+		.delay_usecs = 0,
+		.speed_hz = 1000000,
+		.bits_per_word = 8,
+	};
+
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+  
+	tr.tx_buf = (unsigned long)&addrByte;
+  tr.rx_buf = (unsigned long)&trash;
+	tr.len = len;
+
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+
+	tr.tx_buf = (unsigned long)pData;
+  tr.rx_buf = (unsigned long)&trash;
+	tr.len = len;
+
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+	
+	/*if (ret < 1)
+		pabort("can't send spi message");
+	*/
+	return rx;
+
+  /*TRXEM_SPI_BEGIN();
   TRXEM_SPI_TX(accessType|addrByte);
   TRXEM_SPI_WAIT_DONE();
-  /* Storing chip status */
   readValue = TRXEM_SPI_RX();
   trxReadWriteBurstSingle(accessType|addrByte,pData,len);
-  TRXEM_SPI_END();
-  /* return the status byte value */
-  return(readValue);
+  TRXEM_SPI_END();*/
 }
 
 /******************************************************************************
@@ -107,22 +143,49 @@ rfStatus_t trx8BitRegAccess(uint8_t accessType, uint8_t addrByte, uint8_t *pData
  */
 rfStatus_t trx16BitRegAccess(uint8_t accessType, uint8_t extAddr, uint8_t regAddr, uint8_t *pData, uint8_t len)
 {
-  uint8_t readValue;
+  uint8_t temp = accessType|addrByte;
 
-  TRXEM_SPI_BEGIN();
-  //while(P1IN & BIT1);
-  /* send extended address byte with access type bits set */
+  uint8_t ret = 0;
+  uint8_t rx = 0;
+  
+  uint8_t trash = 0;
+  
+  struct spi_ioc_transfer tr = {
+		.tx_buf = (unsigned long)&temp,
+		.rx_buf = (unsigned long)&rx,
+		.len = len,
+		.delay_usecs = 0,
+		.speed_hz = 1000000,
+		.bits_per_word = 8,
+	};
+
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+  
+	tr.tx_buf = (unsigned long)&regAddr;
+  tr.rx_buf = (unsigned long)&trash;
+	tr.len = len;
+
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+
+	tr.tx_buf = (unsigned long)pData;
+  tr.rx_buf = (unsigned long)&trash;
+	tr.len = len;
+
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+	
+	/*if (ret < 1)
+		pabort("can't send spi message");
+	*/
+	return rx;
+
+  /*TRXEM_SPI_BEGIN();
   TRXEM_SPI_TX(accessType|extAddr);
   TRXEM_SPI_WAIT_DONE();
-  /* Storing chip status */
   readValue = TRXEM_SPI_RX();
   TRXEM_SPI_TX(regAddr);
   TRXEM_SPI_WAIT_DONE();
-  /* Communicate len number of bytes */
   trxReadWriteBurstSingle(accessType|extAddr,pData,len);
-  TRXEM_SPI_END();
-  /* return the status byte value */
-  return(readValue);
+  TRXEM_SPI_END();*/
 }
 
 /*******************************************************************************

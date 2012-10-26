@@ -39,13 +39,6 @@ extern "C" {
  * MACROS
  */
 
-/* Macros for Tranceivers(TRX) */
-#define TRXEM_SPI_BEGIN()              0//st( P2OUT &= ~BIT0; __no_operation(); )
-#define TRXEM_SPI_TX(x)                0//st( UC0IFG &= ~UCA0RXIFG;UCA0TXBUF= (x); )
-#define TRXEM_SPI_WAIT_DONE()          0//st( while(!(UC0IFG & UCA0RXIFG)); )
-#define TRXEM_SPI_RX()                 0//UCA0RXBUF
-#define TRXEM_SPI_END()                0//st( __no_operation(); P2OUT |= BIT0; )
-
 /******************************************************************************
  * TYPEDEFS
  */
