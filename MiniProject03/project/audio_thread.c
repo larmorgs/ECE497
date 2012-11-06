@@ -31,10 +31,10 @@
 #define     SAMPLE_RATE      48000
 
 //* The gain (0-100) of the left channel **
-#define     LEFT_GAIN        100
+#define     LEFT_GAIN        50
 
 //* The gain (0-100) of the right channel **
-#define     RIGHT_GAIN       100
+#define     RIGHT_GAIN       50
 
 //*  Parameters for audio thread execution **
 #define     BLOCKSIZE        48000
@@ -78,10 +78,10 @@ void *audio_thread_fxn( void *envByRef )
     snd_pcm_uframes_t exact_bufsize;		// bufsize is in frames.  Each frame is 4 bytes
 
     int   blksize = BLOCKSIZE;			// Raw input or output frame size in bytes
-    char *outputBuffer = NULL;			// Output buffer for driver to read from
-    char *inputBuffer = NULL;		// Input buffer for driver to read into
+    int *outputBuffer = NULL;			// Output buffer for driver to read from
+    int *inputBuffer = NULL;		// Input buffer for driver to read into
 
-    char *recordBuffer = NULL;
+    int *recordBuffer = NULL;
     
 
 // Thread Create Phase -- secure and initialize resources
@@ -106,14 +106,14 @@ void *audio_thread_fxn( void *envByRef )
 
     blksize = exact_bufsize*BYTESPERFRAME;
     // Create input buffer to read into from OSS input device
-    if( ( inputBuffer = malloc( blksize ) ) == NULL )
+    if( ( inputBuffer = malloc( blksize * sizeof(int) ) ) == NULL )
     {
-        ERR( "Failed to allocate memory for input block (%d)\n", blksize );
+        ERR( "Failed to allocate memory for input block (%d)\n", blksize * sizeof(int) );
         status = AUDIO_THREAD_FAILURE;
         goto  cleanup ;
     }
 
-    DBG( "Allocated input audio buffer of size %d to address %p\n", blksize, inputBuffer );
+    DBG( "Allocated input audio buffer of size %d to address %p\n", blksize * sizeof(int), inputBuffer );
 
     // Record that the input buffer was allocated in initialization bitmask
     initMask |= INPUT_BUFFER_ALLOCATED;
@@ -140,27 +140,27 @@ void *audio_thread_fxn( void *envByRef )
     initMask |= OUTPUT_ALSA_INITIALIZED;
 
     // Create output buffer to write from into ALSA output device
-    if( ( outputBuffer = malloc( blksize ) ) == NULL )
+    if( ( outputBuffer = malloc( blksize * sizeof(int) ) ) == NULL )
     {
-        ERR( "Failed to allocate memory for output block (%d)\n", blksize );
+        ERR( "Failed to allocate memory for output block (%d)\n", blksize * sizeof(int) );
         status = AUDIO_THREAD_FAILURE;
         goto  cleanup ;
     }
 
-    DBG( "Allocated output audio buffer of size %d to address %p\n", blksize, outputBuffer );
+    DBG( "Allocated output audio buffer of size %d to address %p\n", blksize * sizeof(int), outputBuffer );
 
     // Record that the output buffer was allocated in initialization bitmask
     initMask |= OUTPUT_BUFFER_ALLOCATED;
 
     long temp = (long)blksize * RECORDTIME;
-    if( ( recordBuffer = malloc( temp ) ) == NULL )
+    if( ( recordBuffer = malloc( temp * sizeof(int) ) ) == NULL )
     {
-        ERR( "Failed to allocate memory for record block (%d)\n", temp );
+        ERR( "Failed to allocate memory for record block (%d)\n", temp * sizeof(int) );
         status = AUDIO_THREAD_FAILURE;
         goto  cleanup ;
     }
 
-    DBG( "Allocated record audio buffer of size %d to address %p\n", temp, recordBuffer );
+    DBG( "Allocated record audio buffer of size %d to address %p\n", temp * sizeof(int), recordBuffer );
 
     // Record that the output buffer was allocated in initialization bitmask
     initMask |= RECORD_BUFFER_ALLOCATED;
@@ -169,8 +169,9 @@ void *audio_thread_fxn( void *envByRef )
 // **************************************************
     // Get things started by sending some silent buffers out.
     int i;
-    memset(outputBuffer, 0, blksize);		// Clear the buffer
-    memset(recordBuffer, 0, temp);
+    memset(outputBuffer, 0, blksize * sizeof(int));		// Clear the buffers
+    memset(inputBuffer, 0, blksize * sizeof(int));
+    memset(recordBuffer, 0, temp * sizeof(int));
     for(i=0; i<5; i++) {
 	while ((snd_pcm_readi(pcm_capture_handle, inputBuffer, 
 		blksize/BYTESPERFRAME)) < 0) {
@@ -205,14 +206,14 @@ void *audio_thread_fxn( void *envByRef )
             status = AUDIO_THREAD_FAILURE;
             goto  cleanup ;
         }
-        memcpy(outputBuffer, inputBuffer, blksize);
+        memcpy(outputBuffer, inputBuffer, blksize * sizeof(int));
         if ( envPtr->replay == 1 ) {
             int i;
             for (i = 0; i < blksize; i++) {
                 outputBuffer[i] += recordBuffer[((count%RECORDTIME)*blksize)+i];
             }
         } else {
-            memcpy((signed int)recordBuffer+(signed int)((count%RECORDTIME)*blksize), inputBuffer, blksize);
+            memcpy(&recordBuffer[((count%RECORDTIME)*blksize)], inputBuffer, blksize * sizeof(int));
         }
         
         // Write output buffer into ALSA output device
