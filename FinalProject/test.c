@@ -3,11 +3,11 @@
 #include <fcntl.h>
 
 int main() { 
-  char out[] = "HelloWorld";
+  char out[] = "Testing12";
   char in[10];
   FILE *fp;
   
-  fp = fopen("/dev/example", "rw");
+  fp = fopen("/sys/", "rw");
   if (fp == NULL) {
     return 1;
   }
